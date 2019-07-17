@@ -9,3 +9,7 @@ exchange_type = topic
 routing_key = #
 queue = somequeue
 
+[artifactory]
+search_url = https://some-url/artifactory/api/search/aql/
+username = someusername
+password = somepassword
