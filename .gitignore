@@ -12,3 +12,6 @@ rabbitmq.config
 
 # IntelliJ
 .idea/
+
+# Pycache
+__pycache__/
