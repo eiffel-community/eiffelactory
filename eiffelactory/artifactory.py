@@ -7,8 +7,6 @@ import requests
 from requests.auth import HTTPBasicAuth
 from kombu.utils import json
 
-from eiffel import EIFFEL_ARTIFACT_CREATED_EVENT
-
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../rabbitmq.config')
 AF_SECTION = CONFIG['artifactory']

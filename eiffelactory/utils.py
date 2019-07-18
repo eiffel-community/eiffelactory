@@ -18,3 +18,10 @@ def setup_logger(logname, filename, level=logging.WARNING):
     logger.setLevel(level)
     logger.addHandler(handler)
 
+
+def remove_none_from_dict(dictionary):
+    if not isinstance(dictionary, dict):
+        return dictionary
+
+    return dict((k, remove_none_from_dict(v)) for k, v in dictionary.items() if v is not None)
+

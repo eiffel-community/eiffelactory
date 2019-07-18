@@ -13,3 +13,8 @@ queue = somequeue
 url = https://localhost:8081/artifactory
 username = someusername
 password = somepassword
+
+[eiffelactory]
+# used to filter received messages by meta.source.name
+# if event_sources is not included, all ArtC events are processed
+event_sources = META_SOURCE_NAME, another-source_name
