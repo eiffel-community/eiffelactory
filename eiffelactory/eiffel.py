@@ -75,6 +75,7 @@ class Location(dict):
         super().__init__(self, type=location_type, uri=uri)
 
 
-def create_artifact_published_meta(tags=None, source=None):
+def create_artifact_published_meta():
     """Returns  a meta object for an EiffelArtifactPublished event"""
-    return Meta(EIFFEL_ARTIFACT_PUBLISHED_EVENT, VERSION_3_0_0, tags=tags, source=source)
+    source = Source(name='EIFFELACTORY')
+    return Meta(EIFFEL_ARTIFACT_PUBLISHED_EVENT, VERSION_3_0_0, source=source)

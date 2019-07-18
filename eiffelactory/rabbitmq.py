@@ -6,21 +6,22 @@ import signal
 import sys
 
 from kombu import Connection, Exchange, Queue
-
-from artifactory import find_artifact
+from kombu.utils import json
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../rabbitmq.config')
+RMQ_SECTION = CONFIG["rabbitmq"]
 
-USERNAME = CONFIG.get('rabbitmq', 'username')
-PASSWORD = CONFIG.get('rabbitmq', 'password')
-HOST = CONFIG.get('rabbitmq', 'host')
-PORT = int(CONFIG.get('rabbitmq', 'port'))
-VHOST = CONFIG.get('rabbitmq', 'vhost')
-EXCHANGE = CONFIG.get('rabbitmq', 'exchange')
-EXCHANGE_TYPE = CONFIG.get('rabbitmq', 'exchange_type')
-ROUTING_KEY = CONFIG.get('rabbitmq', 'routing_key')
-QUEUE = CONFIG.get('rabbitmq', 'queue')
+USERNAME = RMQ_SECTION.get('username')
+PASSWORD = RMQ_SECTION.get('password')
+HOST = RMQ_SECTION.get('host')
+PORT = RMQ_SECTION.getint('port')
+VHOST = RMQ_SECTION.get('vhost')
+EXCHANGE = RMQ_SECTION.get('exchange')
+EXCHANGE_TYPE = RMQ_SECTION.get('exchange_type')
+ROUTING_KEY = RMQ_SECTION.get('routing_key')
+QUEUE = RMQ_SECTION.get('queue')
+PREFETCH_COUNT = RMQ_SECTION.getint("prefetch_count", 200)
 
 EIFFEL_EXCHANGE = Exchange(EXCHANGE)
 EIFFEL_QUEUE = Queue(QUEUE, routing_key=ROUTING_KEY)
@@ -30,7 +31,9 @@ class RabbitMQConnection:
     """
     Class handling receiving and publishing message on the RabbitMQ messages bus
     """
-    def __init__(self):
+    def __init__(self, message_callback):
+        self.message_callback = message_callback
+
         self.connection = Connection(transport='amqp',
                                      hostname=HOST,
                                      port=PORT,
@@ -42,18 +45,29 @@ class RabbitMQConnection:
         self.producer = self.connection.Producer(serializer='json')
         self.consumer = self.connection.Consumer(
             EIFFEL_QUEUE,
-            callbacks=[self.process_message])
+            callbacks=[self.handle_message],
+            prefetch_count=PREFETCH_COUNT)
+
         self.consuming = True
         signal.signal(signal.SIGINT, self.signal_handler)
 
-    def process_message(self, body, message):
+    def handle_message(self, body, message):
         """
         Callback called by consumer.
         :param body:
         :param message:
         :return:
         """
-        find_artifact(body)
+
+        # body is sometimes dict and sometimes str
+        # make sure it's a json dict before passing it on
+        json_body = dict()
+        if type(body) is dict:
+            json_body = body
+        elif type(body) is str:
+            json_body = json.loads(body)
+
+        self.message_callback(json_body)
         message.ack()
 
     def publish_message(self, message):
@@ -75,8 +89,8 @@ class RabbitMQConnection:
 
     def read_messages(self):
         """
-        Method reading messages from the queue in a whilte-true loop. Callabck
-        is defined in __init__
+        Method reading messages from the queue in a while-true loop.
+        Callback is defined in __init__
         :return:
         """
         with self.consumer:
@@ -106,8 +120,3 @@ class RabbitMQConnection:
         print("\nExiting")
         sys.exit(0)
 
-
-if __name__ == "__main__":
-    # this is for easy testing
-    mq = RabbitMQConnection()
-    mq.read_messages()

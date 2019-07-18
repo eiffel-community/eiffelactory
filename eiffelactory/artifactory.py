@@ -26,13 +26,8 @@ def find_artifact(body):
     and sending an AQL query to Artifactory
     :param body: the body of the received RabbitMQ messages
     """
-    json_body = dict()
-    if type(body) is dict:
-        json_body = body
-    elif type(body) is str:
-        json_body = json.loads(body)
-    if json_body['meta']['type'] == EIFFEL_ARTIFACT_CREATED_EVENT:
-        purl = json_body['data']['identity']
+    if body['meta']['type'] == EIFFEL_ARTIFACT_CREATED_EVENT:
+        purl = body['data']['identity']
         find_artifact_on_artifactory(*parse_purl(purl))
         # print(str(body))
 
@@ -70,11 +65,6 @@ def find_artifact_on_artifactory(artifact_filename, build_path_substring):
 
     if response.status_code == 200:
         content = response.content.decode('utf-8')
-        print(content)
         json_content = json.loads(content)
         results = json_content['results']
-        if results:
-            print("Results: %s", results)
-            with open('results.txt', 'a') as file:
-                file.write(str(results))
-                file.write("\n\n")
+        return results
