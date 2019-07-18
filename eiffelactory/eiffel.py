@@ -79,3 +79,11 @@ def create_artifact_published_meta():
     """Returns  a meta object for an EiffelArtifactPublished event"""
     source = Source(name='EIFFELACTORY')
     return Meta(EIFFEL_ARTIFACT_PUBLISHED_EVENT, VERSION_3_0_0, source=source)
+
+
+def is_eiffel_event_type(message, event_type):
+    return message['meta']['type'] == event_type
+
+
+def is_artifact_created_event(message):
+    return is_eiffel_event_type(message, EIFFEL_ARTIFACT_CREATED_EVENT)

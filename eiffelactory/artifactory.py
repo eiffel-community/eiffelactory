@@ -7,17 +7,20 @@ import requests
 from requests.auth import HTTPBasicAuth
 from kombu.utils import json
 
+from eiffel import EIFFEL_ARTIFACT_CREATED_EVENT
+
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../rabbitmq.config')
+AF_SECTION = CONFIG['artifactory']
 
-EIFFEL_ARTIFACT_CREATED_EVENT = "EiffelArtifactCreatedEvent"
 AQL_DOMAIN_SEARCH_STRING = \
     'items.find({{"$or":[{{"artifact.name":"{}"}},{{"name":"{}"}}],' \
     '"artifact.module.build.url":{{"$match":"*{}*"}}}}).' \
     'include("name","repo","path")'
-ARTIFACTORY_SEARCH_URL = CONFIG.get('artifactory', 'search_url')
-ARTIFACTORY_USER = CONFIG.get('artifactory', 'username')
-ARTIFACTORY_PASSWORD = CONFIG.get('artifactory', 'password')
+ARTIFACTORY_URL = AF_SECTION.get('url')
+ARTIFACTORY_SEARCH_URL = ARTIFACTORY_URL + '/api/search/aql/'
+ARTIFACTORY_USER = AF_SECTION.get('username')
+ARTIFACTORY_PASSWORD = AF_SECTION.get('password')
 
 
 def find_artifact(body):
@@ -26,10 +29,8 @@ def find_artifact(body):
     and sending an AQL query to Artifactory
     :param body: the body of the received RabbitMQ messages
     """
-    if body['meta']['type'] == EIFFEL_ARTIFACT_CREATED_EVENT:
-        purl = body['data']['identity']
-        find_artifact_on_artifactory(*parse_purl(purl))
-        # print(str(body))
+    purl = body['data']['identity']
+    find_artifact_on_artifactory(*parse_purl(purl))
 
 
 def parse_purl(purl):
