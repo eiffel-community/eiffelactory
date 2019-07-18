@@ -2,10 +2,10 @@ import configparser
 import logging
 from kombu.utils import json
 
-from eiffelactory.artifactory import find_artifact
-from eiffelactory.eiffel import *
-from eiffelactory.rabbitmq import RabbitMQConnection
-from eiffelactory.utils import setup_logger
+from artifactory import find_artifact
+from eiffel import *
+from rabbitmq import RabbitMQConnection
+from utils import setup_logger
 
 setup_logger('received', 'received.log', logging.INFO)
 setup_logger('artifacts', 'artifacts.log', logging.INFO)
