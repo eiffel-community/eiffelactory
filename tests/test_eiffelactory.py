@@ -1,6 +1,6 @@
-from eiffelactory.eiffel import *
-from eiffelactory.artifactory import parse_purl
-from eiffelactory import utils
+import utils
+import eiffel
+from artifactory import parse_purl
 
 import unittest
 
@@ -11,7 +11,7 @@ class EiffelactoryTestSuite(unittest.TestCase):
         artc_event_id = '5de6f82d-52b6-44ae-bdbb-0be4fc213184'
         location = 'https://some.location/some-repo/some-path/artifact.txt'
 
-        event = create_artifact_published_event(artc_event_id, [Location(location)])
+        event = eiffel.create_artifact_published_event(artc_event_id, [eiffel.Location(location)])
 
         assert(event['meta']['type'] == 'EiffelArtifactPublishedEvent')
         assert(event['links'][0]['type'] == 'ARTIFACT')
@@ -38,30 +38,30 @@ class EiffelactoryTestSuite(unittest.TestCase):
         assert(clean == expected)
 
     def test_is_event_sent_from_sources(self):
-        with_source_name = Meta(EIFFEL_ARTIFACT_CREATED_EVENT,
-                                VERSION_3_0_0,
-                                source=Source(name='JENKINS_EIFFEL_BROADCASTER'))
+        with_source_name = eiffel.Meta(eiffel.EIFFEL_ARTIFACT_CREATED_EVENT,
+                                       eiffel.VERSION_3_0_0,
+                                       source=eiffel.Source(name='JENKINS_EIFFEL_BROADCASTER'))
 
-        with_wrong_source_name = Meta(EIFFEL_ARTIFACT_CREATED_EVENT,
-                                      VERSION_3_0_0,
-                                      source=Source(name='OTHER_SOURCE'))
+        with_wrong_source_name = eiffel.Meta(eiffel.EIFFEL_ARTIFACT_CREATED_EVENT,
+                                             eiffel.VERSION_3_0_0,
+                                             source=eiffel.Source(name='OTHER_SOURCE'))
 
-        without_source = Meta(EIFFEL_ARTIFACT_CREATED_EVENT, VERSION_3_0_0)
+        without_source = eiffel.Meta(eiffel.EIFFEL_ARTIFACT_CREATED_EVENT, eiffel.VERSION_3_0_0)
 
-        without_source_name = Meta(EIFFEL_ARTIFACT_CREATED_EVENT,
-                                   VERSION_3_0_0,
-                                   source=Source(host='some host'))
+        without_source_name = eiffel.Meta(eiffel.EIFFEL_ARTIFACT_CREATED_EVENT,
+                                          eiffel.VERSION_3_0_0,
+                                          source=eiffel.Source(host='some host'))
 
         event1 = {'data': {}, 'links': [], 'meta': with_source_name}
         event2 = {'data': {}, 'links': [], 'meta': with_wrong_source_name}
         event3 = {'data': {}, 'links': [], 'meta': without_source}
         event4 = {'data': {}, 'links': [], 'meta': without_source_name}
 
-        assert(is_event_sent_from_sources(event1, [JENKINS_EIFFEL_BROADCASTER]))
-        assert(is_event_sent_from_sources(event2, [JENKINS_EIFFEL_BROADCASTER, 'OTHER_SOURCE']))
-        assert(not is_event_sent_from_sources(event2, [JENKINS_EIFFEL_BROADCASTER]))
-        assert(not is_event_sent_from_sources(event3, [JENKINS_EIFFEL_BROADCASTER]))
-        assert(not is_event_sent_from_sources(event4, [JENKINS_EIFFEL_BROADCASTER]))
+        assert(eiffel.is_event_sent_from_sources(event1, ['JENKINS_EIFFEL_BROADCASTER']))
+        assert(eiffel.is_event_sent_from_sources(event2, ['JENKINS_EIFFEL_BROADCASTER', 'OTHER_SOURCE']))
+        assert(not eiffel.is_event_sent_from_sources(event2, ['JENKINS_EIFFEL_BROADCASTER']))
+        assert(not eiffel.is_event_sent_from_sources(event3, ['JENKINS_EIFFEL_BROADCASTER']))
+        assert(not eiffel.is_event_sent_from_sources(event4, ['JENKINS_EIFFEL_BROADCASTER']))
 
 
 if __name__ == '__main__':
