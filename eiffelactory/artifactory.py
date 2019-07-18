@@ -12,7 +12,7 @@ CONFIG.read('../rabbitmq.config')
 
 EIFFEL_ARTIFACT_CREATED_EVENT = "EiffelArtifactCreatedEvent"
 AQL_DOMAIN_SEARCH_STRING = \
-    'items.find({{"name":"{}",' \
+    'items.find({{"$or":[{{"artifact.name":"{}"}},{{"name":"{}"}}],' \
     '"artifact.module.build.url":{{"$match":"*{}*"}}}}).' \
     'include("name","repo","path")'
 ARTIFACTORY_SEARCH_URL = CONFIG.get('artifactory', 'search_url')
@@ -26,9 +26,15 @@ def find_artifact(body):
     and sending an AQL query to Artifactory
     :param body: the body of the received RabbitMQ messages
     """
-    if body['meta']['type'] == EIFFEL_ARTIFACT_CREATED_EVENT:
-        purl = body['data']['identity']
+    json_body = dict()
+    if type(body) is dict:
+        json_body = body
+    elif type(body) is str:
+        json_body = json.loads(body)
+    if json_body['meta']['type'] == EIFFEL_ARTIFACT_CREATED_EVENT:
+        purl = json_body['data']['identity']
         find_artifact_on_artifactory(*parse_purl(purl))
+        # print(str(body))
 
 
 def parse_purl(purl):
@@ -53,6 +59,7 @@ def find_artifact_on_artifactory(artifact_filename, build_path_substring):
     :return:
     """
     query_string = AQL_DOMAIN_SEARCH_STRING.format(artifact_filename,
+                                                   artifact_filename,
                                                    build_path_substring)
 
     # print(query_string)
@@ -61,9 +68,13 @@ def find_artifact_on_artifactory(artifact_filename, build_path_substring):
                                                 ARTIFACTORY_PASSWORD),
                              data=query_string)
 
-    content = response.content.decode('utf-8')
-    if response == 200:
+    if response.status_code == 200:
+        content = response.content.decode('utf-8')
+        print(content)
         json_content = json.loads(content)
         results = json_content['results']
         if results:
             print("Results: %s", results)
+            with open('results.txt', 'a') as file:
+                file.write(str(results))
+                file.write("\n\n")
