@@ -10,6 +10,6 @@ routing_key = #
 queue = somequeue
 
 [artifactory]
-search_url = https://some-url/artifactory/api/search/aql/
+url = https://localhost:8081/artifactory
 username = someusername
 password = somepassword
