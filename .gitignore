@@ -15,3 +15,7 @@ rabbitmq.config
 
 # Pycache
 __pycache__/
+
+# Logs
+logs/
+*.log

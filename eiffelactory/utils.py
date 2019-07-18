@@ -1,5 +1,6 @@
 import time
 import uuid
+import logging
 
 
 def current_time_millis():
@@ -9,3 +10,10 @@ def current_time_millis():
 
 def generate_uuid():
     return str(uuid.uuid4())
+
+
+def setup_logger(logname, filename, level=logging.WARNING):
+    handler = logging.FileHandler("../logs/%s" % filename)
+    logger = logging.getLogger(logname)
+    logger.setLevel(level)
+    logger.addHandler(handler)
