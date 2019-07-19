@@ -33,8 +33,7 @@ class App(object):
         LOGGER_RECEIVED.info(event)
 
         if CFG.eiffelactory.event_sources:
-            if not is_event_sent_from_sources(
-                    event, CFG.eiffelactory.event_sources):
+            if not is_sent_from_sources(event, CFG.eiffelactory.event_sources):
                 return
 
         artc_meta_id = event['meta']['id']
