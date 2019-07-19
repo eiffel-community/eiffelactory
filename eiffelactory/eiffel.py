@@ -1,4 +1,4 @@
-from eiffelactory.utils import current_time_millis, generate_uuid, remove_none_from_dict
+from utils import current_time_millis, generate_uuid, remove_none_from_dict
 
 # Eiffel event types
 EIFFEL_ARTIFACT_PUBLISHED_EVENT = "EiffelArtifactPublishedEvent"

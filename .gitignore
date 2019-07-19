@@ -8,8 +8,8 @@ env.bak/
 venv.bak/
 
 # Secret configuration files
-rabbitmq.config
 .svceiffelactory_password
+eiffelactory.config
 
 # IntelliJ
 .idea/

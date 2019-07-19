@@ -1,17 +1,17 @@
-from eiffelactory.eiffel import *
-from eiffelactory.artifactory import parse_purl
-from eiffelactory import utils
-
 import unittest
+
+from eiffel import *
+from utils import *
 
 
 class EiffelactoryTestSuite(unittest.TestCase):
 
     def test_create_eiffel_published_event(self):
-        artc_event_id = '5de6f82d-52b6-44ae-bdbb-0be4fc213184'
+        artc_meta_id = '5de6f82d-52b6-44ae-bdbb-0be4fc213184'
         location = 'https://some.location/some-repo/some-path/artifact.txt'
 
-        event = create_artifact_published_event(artc_event_id, [Location(location)])
+        event = create_artifact_published_event(artc_meta_id,
+                                                [Location(location)])
 
         assert(event['meta']['type'] == 'EiffelArtifactPublishedEvent')
         assert(event['links'][0]['type'] == 'ARTIFACT')
@@ -32,7 +32,7 @@ class EiffelactoryTestSuite(unittest.TestCase):
                       "test2": "not none",
                       "test3": {"nested": None, "nested2": "not none"}}
 
-        clean = utils.remove_none_from_dict(dictionary)
+        clean = remove_none_from_dict(dictionary)
 
         expected = {"test2": "not none", "test3": {"nested2": "not none"}}
         assert(clean == expected)
@@ -57,11 +57,16 @@ class EiffelactoryTestSuite(unittest.TestCase):
         event3 = {'data': {}, 'links': [], 'meta': without_source}
         event4 = {'data': {}, 'links': [], 'meta': without_source_name}
 
-        assert(is_event_sent_from_sources(event1, [JENKINS_EIFFEL_BROADCASTER]))
-        assert(is_event_sent_from_sources(event2, [JENKINS_EIFFEL_BROADCASTER, 'OTHER_SOURCE']))
-        assert(not is_event_sent_from_sources(event2, [JENKINS_EIFFEL_BROADCASTER]))
-        assert(not is_event_sent_from_sources(event3, [JENKINS_EIFFEL_BROADCASTER]))
-        assert(not is_event_sent_from_sources(event4, [JENKINS_EIFFEL_BROADCASTER]))
+        assert(is_event_sent_from_sources(
+            event1, ['JENKINS_EIFFEL_BROADCASTER']))
+        assert(is_event_sent_from_sources(
+            event2, ['JENKINS_EIFFEL_BROADCASTER', 'OTHER_SOURCE']))
+        assert(not is_event_sent_from_sources(
+            event2, ['JENKINS_EIFFEL_BROADCASTER']))
+        assert(not is_event_sent_from_sources(
+            event3, ['JENKINS_EIFFEL_BROADCASTER']))
+        assert(not is_event_sent_from_sources(
+            event4, ['JENKINS_EIFFEL_BROADCASTER']))
 
 
 if __name__ == '__main__':
