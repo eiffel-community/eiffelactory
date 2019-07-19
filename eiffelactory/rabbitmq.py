@@ -39,7 +39,7 @@ class RabbitMQConnection:
                            routing_key=CFG.routing_key)
         self.queue.declare()
         self.queue.bind_to(exchange=EIFFEL_EXCHANGE,
-                           routing_key=CFG.prefetch_count)
+                           routing_key=CFG.routing_key)
         self.consumer = self.connection.\
             Consumer(
                     queues=self.queue,
