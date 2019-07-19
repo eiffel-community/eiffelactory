@@ -19,9 +19,11 @@ EXCHANGE_TYPE = RMQ_SECTION.get('exchange_type')
 ROUTING_KEY = RMQ_SECTION.get('routing_key')
 QUEUE = RMQ_SECTION.get('queue')
 PREFETCH_COUNT = RMQ_SECTION.getint("prefetch_count", 200)
-
-EIFFEL_EXCHANGE = Exchange(EXCHANGE)
-EIFFEL_QUEUE = Queue(QUEUE, routing_key=ROUTING_KEY)
+# we can't declare new Exchanges yet so comment it out for now
+EIFFEL_EXCHANGE = Exchange(EXCHANGE,
+                           # durable=True,
+                           # delivery_mode="persistent"
+                           )
 
 
 class RabbitMQConnection:
@@ -39,11 +41,18 @@ class RabbitMQConnection:
                                      virtual_host=VHOST,
                                      ssl=True)
         self.connection.connect()
-        self.producer = self.connection.Producer(serializer='json')
+        self.producer = self.connection.Producer(serializer='json',
+                                                 auto_declare=True)
+        self.eiffelactory_queue = Queue(channel=self.connection.channel(),
+                                        name=QUEUE,
+                                        routing_key=ROUTING_KEY)
+        self.eiffelactory_queue.declare()
+        self.eiffelactory_queue.bind_to(exchange=EXCHANGE,
+                                        routing_key=ROUTING_KEY)
         self.consumer = self.connection.Consumer(
-            EIFFEL_QUEUE,
-            callbacks=[self.handle_message],
-            prefetch_count=PREFETCH_COUNT)
+                                                queues=self.eiffelactory_queue,
+                                                callbacks=[self.handle_message],
+                                                prefetch_count=PREFETCH_COUNT)
 
         self.consuming = True
 
@@ -81,7 +90,8 @@ class RabbitMQConnection:
                                   'max_retries': 30,
                               },
                               exchange=EIFFEL_EXCHANGE,
-                              routing_key=ROUTING_KEY)
+                              routing_key=ROUTING_KEY,
+                              declare=[EIFFEL_EXCHANGE])
 
     def read_messages(self):
         """
