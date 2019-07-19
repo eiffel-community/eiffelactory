@@ -1,3 +1,7 @@
+"""
+Utils module used by other classes in the app for parsing purl, creating
+timestamps, etc.
+"""
 import logging
 import time
 import uuid

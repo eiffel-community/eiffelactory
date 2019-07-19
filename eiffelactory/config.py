@@ -1,3 +1,6 @@
+"""
+Config module for prettier logging across the classes in the app
+"""
 import configparser
 
 CONFIG = configparser.ConfigParser()
@@ -8,7 +11,10 @@ CONFIG_ARTIFACTORY = CONFIG['artifactory']
 CONFIG_EIFFELACTORY = CONFIG['eiffelactory']
 
 
-class Config(object):
+class Config:
+    """
+    for prettier logging across the classes in the app
+    """
     def __init__(self):
         self.config = CONFIG
         self.rabbitmq = RabbitMQConfig()
@@ -16,7 +22,11 @@ class Config(object):
         self.eiffelactory = EiffelactoryConfig()
 
 
-class ConfigSection(object):
+class ConfigSection:
+    """
+    Wrapper parent class for easier and safer extraction of configs from
+    the config file
+    """
     def __init__(self, section):
         self.section = section
 
@@ -31,6 +41,10 @@ class ConfigSection(object):
 
 
 class RabbitMQConfig(ConfigSection):
+    """
+    Child of ConfigSection for easier and safer extraction of RabbitMQ-related
+    configs from the config file
+    """
     DEFAULT_ROUTING_KEY = '#'
     DEFAULT_VHOST = '/'
     DEFAULT_PREFETCH_COUNT = '50'
@@ -80,6 +94,10 @@ class RabbitMQConfig(ConfigSection):
 
 
 class ArtifactoryConfig(ConfigSection):
+    """
+    Child of ConfigSection for easier and safer extraction of Artifactory-
+    related configs from the config file
+    """
     def __init__(self):
         super().__init__(CONFIG_ARTIFACTORY)
 
@@ -97,6 +115,10 @@ class ArtifactoryConfig(ConfigSection):
 
 
 class EiffelactoryConfig(ConfigSection):
+    """
+    Child of ConfigSection for easier and safer extraction of related
+    configs specifically for this plugin from the config file
+    """
     def __init__(self):
         super().__init__(CONFIG_EIFFELACTORY)
 

@@ -5,8 +5,8 @@ the received Eiffel ArtC events.
 import logging
 
 import requests
-from kombu.utils import json
 from requests.auth import HTTPBasicAuth
+from kombu.utils import json
 
 from config import Config
 
@@ -44,3 +44,7 @@ def find_artifact_on_artifactory(artifact_filename, build_path_substring):
         results = json_content['results']
         LOGGER.debug(results)
         return results
+    LOGGER.error("Failure when connecting to Artifactory. "
+                 "Response code: %d\nReason:\n%s",
+                 response.status_code, response.reason)
+    return []

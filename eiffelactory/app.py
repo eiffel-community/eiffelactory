@@ -1,3 +1,7 @@
+"""
+Main module that starts RabbitMQ connection and publishes ArtifactPublished
+events
+"""
 import logging
 import signal
 import sys
@@ -5,7 +9,8 @@ import sys
 from kombu.utils import json
 from artifactory import find_artifact_on_artifactory
 from config import Config
-from eiffel import *
+from eiffel import Location, create_artifact_published_event, \
+    is_sent_from_sources, is_artifact_created_event
 from rabbitmq import RabbitMQConnection
 from utils import setup_logger, parse_purl
 
@@ -20,13 +25,22 @@ LOGGER_RECEIVED = logging.getLogger('received')
 CFG = Config()
 
 
-class App(object):
-
+class App:
+    """
+    that starts RabbitMQ connection and publishes ArtifactPublished
+    events
+    """
     def __init__(self):
         self.rmq_connection = RabbitMQConnection(self.on_event_received)
         signal.signal(signal.SIGINT, self._signal_handler)
 
     def on_event_received(self, event):
+        """
+        Callback method passed to RabbitMQConnection and that processes
+        received messages
+        :param event: RabbitMQ message
+        :return:
+        """
         if not is_artifact_created_event(event):
             return
 
@@ -55,6 +69,12 @@ class App(object):
                 self._publish_artp_event(artc_meta_id, artifact[0])
 
     def _publish_artp_event(self, artc_meta_id, artifact):
+        """
+        Creates and ArtifactPublished event and sends it to RabbitMQ exchange
+        :param artc_meta_id: the id of ArtifactCreated event
+        :param artifact: the results dictionary returned from Artifactory by the
+        AQL query.
+        """
         LOGGER_ARTIFACTS.info(artifact)
 
         location = '%s/%s/%s/%s' % (CFG.artifactory.url,
@@ -71,6 +91,9 @@ class App(object):
             json.dumps(artifact_published_event))
 
     def run(self):
+        """
+        Starts the app by starting to listen to RabbitMQ messages.
+        """
         self.rmq_connection.read_messages()
 
     def _signal_handler(self, signal_received, frame):
@@ -88,5 +111,5 @@ class App(object):
 
 
 if __name__ == "__main__":
-    app = App()
-    app.run()
+    APP = App()
+    APP.run()

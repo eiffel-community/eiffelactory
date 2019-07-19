@@ -50,13 +50,12 @@ class RabbitMQConnection:
         :param message:
         :return:
         """
-
         # body is sometimes dict and sometimes str
         # make sure it's a json dict before passing it on
         json_body = dict()
-        if type(body) is dict:
+        if isinstance(body, dict):
             json_body = body
-        elif type(body) is str:
+        elif isinstance(body, str):
             json_body = json.loads(body)
 
         self.message_callback(json_body)
@@ -98,4 +97,3 @@ class RabbitMQConnection:
         self.consuming = False
         self.producer.release()
         self.connection.release()
-
