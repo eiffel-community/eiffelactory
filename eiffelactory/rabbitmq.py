@@ -82,8 +82,7 @@ class RabbitMQConnection:
                                   'max_retries': 30,
                               },
                               exchange=self.exchange,
-                              routing_key=CFG.routing_key,
-                              declare=[EIFFEL_EXCHANGE])
+                              routing_key=CFG.routing_key)
 
     def read_messages(self):
         """
