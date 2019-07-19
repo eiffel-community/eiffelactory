@@ -1,5 +1,8 @@
 import configparser
 import logging
+import signal
+import sys
+
 from kombu.utils import json
 
 from eiffelactory.artifactory import find_artifact
@@ -29,6 +32,7 @@ class App(object):
 
     def __init__(self):
         self.rmq_connection = RabbitMQConnection(self.on_message_received)
+        signal.signal(signal.SIGINT, self.signal_handler)
 
     def on_message_received(self, event_json):
         if not is_artifact_created_event(event_json):
@@ -55,6 +59,19 @@ class App(object):
 
     def run(self):
         self.rmq_connection.read_messages()
+
+    def signal_handler(self, signal_received, frame):
+        """
+        Method for handling Ctrl-C. The two unused arguments have to be there,
+        otherwise it won't work
+        :param signal_received:
+        :param frame:
+        :return:
+        """
+        # closes down everything when Ctrl-C is pressed
+        self.rmq_connection.close_connection()
+        print("\nExiting")
+        sys.exit(0)
 
 
 if __name__ == "__main__":

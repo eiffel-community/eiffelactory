@@ -2,9 +2,6 @@
 Module for sending and receiving messages from RabbitMQ.
 """
 import configparser
-import signal
-import sys
-
 from kombu import Connection, Exchange, Queue
 from kombu.utils import json
 
@@ -49,7 +46,6 @@ class RabbitMQConnection:
             prefetch_count=PREFETCH_COUNT)
 
         self.consuming = True
-        signal.signal(signal.SIGINT, self.signal_handler)
 
     def handle_message(self, body, message):
         """
@@ -106,17 +102,4 @@ class RabbitMQConnection:
         self.consuming = False
         self.producer.release()
         self.connection.release()
-
-    def signal_handler(self, signal_received, frame):
-        """
-        Method for handling Ctrl-C. The two unused arguments have to be there,
-        otherwise it won't work
-        :param signal_received:
-        :param frame:
-        :return:
-        """
-        # closes down everything when Ctrl-C is pressed
-        self.close_connection()
-        print("\nExiting")
-        sys.exit(0)
 
