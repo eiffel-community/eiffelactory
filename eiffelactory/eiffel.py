@@ -114,7 +114,7 @@ class Location(dict):
         super().__init__(self, type=location_type, uri=uri)
 
 
-def create_artifact_published_meta():
+def _create_artifact_published_meta():
     """
     Creates a Meta object with pre-filled ArtP data.
     :return: Meta object with pre-filled ArtP data
@@ -137,7 +137,7 @@ def create_artifact_published_event(artc_event_id, locations):
     """
     data = ArtifactPublishedData(locations)
     links = [Link(Link.ARTIFACT, artc_event_id)]
-    meta = create_artifact_published_meta()
+    meta = _create_artifact_published_meta()
 
     event = Event(data, links, meta)
 

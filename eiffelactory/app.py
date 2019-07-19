@@ -24,7 +24,7 @@ class App(object):
 
     def __init__(self):
         self.rmq_connection = RabbitMQConnection(self.on_event_received)
-        signal.signal(signal.SIGINT, self.signal_handler)
+        signal.signal(signal.SIGINT, self._signal_handler)
 
     def on_event_received(self, event):
         if not is_artifact_created_event(event):
@@ -73,7 +73,7 @@ class App(object):
     def run(self):
         self.rmq_connection.read_messages()
 
-    def signal_handler(self, signal_received, frame):
+    def _signal_handler(self, signal_received, frame):
         """
         Method for handling Ctrl-C. The two unused arguments have to be there,
         otherwise it won't work

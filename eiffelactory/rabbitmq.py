@@ -38,12 +38,12 @@ class RabbitMQConnection:
         self.consumer = self.connection.\
             Consumer(
                     queues=self.queue,
-                    callbacks=[self.handle_message],
+                    callbacks=[self._handle_message],
                     prefetch_count=
                     CFG.prefetch_count)
         self.consuming = True
 
-    def handle_message(self, body, message):
+    def _handle_message(self, body, message):
         """
         Callback called by consumer.
         :param body:
