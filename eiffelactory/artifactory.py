@@ -3,9 +3,13 @@ Module for querying Artifactory to confirm the presence of the artifacts from
 the received Eiffel ArtC events.
 """
 import configparser
+import logging
+
 import requests
 from requests.auth import HTTPBasicAuth
 from kombu.utils import json
+
+from utils import setup_logger
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../rabbitmq.config')
@@ -20,6 +24,12 @@ ARTIFACTORY_SEARCH_URL = ARTIFACTORY_URL + '/api/search/aql/'
 ARTIFACTORY_USER = AF_SECTION.get('username')
 ARTIFACTORY_PASSWORD = AF_SECTION.get('password')
 
+setup_logger('received', 'received.log', logging.INFO)
+setup_logger('artifacts', 'artifacts.log', logging.INFO)
+setup_logger('published', 'published.log', logging.INFO)
+
+LOGGER_RECEIVED = logging.getLogger("received")
+
 
 def find_artifact(body):
     """
@@ -28,7 +38,9 @@ def find_artifact(body):
     :param body: the body of the received RabbitMQ messages
     """
     purl = body['data']['identity']
-    find_artifact_on_artifactory(*parse_purl(purl))
+    results = find_artifact_on_artifactory(*parse_purl(purl))
+    if results:
+        return results
 
 
 def parse_purl(purl):
@@ -56,7 +68,7 @@ def find_artifact_on_artifactory(artifact_filename, build_path_substring):
                                                    artifact_filename,
                                                    build_path_substring)
 
-    # print(query_string)
+    print(query_string)
     response = requests.post(ARTIFACTORY_SEARCH_URL,
                              auth=HTTPBasicAuth(ARTIFACTORY_USER,
                                                 ARTIFACTORY_PASSWORD),
