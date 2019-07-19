@@ -9,6 +9,7 @@ venv.bak/
 
 # Secret configuration files
 rabbitmq.config
+eiffelactory.config
 
 # IntelliJ
 .idea/

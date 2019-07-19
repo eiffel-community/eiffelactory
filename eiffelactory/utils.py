@@ -1,6 +1,6 @@
+import logging
 import time
 import uuid
-import logging
 
 
 def current_time_millis():
@@ -23,5 +23,18 @@ def remove_none_from_dict(dictionary):
     if not isinstance(dictionary, dict):
         return dictionary
 
-    return dict((k, remove_none_from_dict(v)) for k, v in dictionary.items() if v is not None)
+    return dict((k, remove_none_from_dict(v))
+                for k, v in dictionary.items()
+                if v is not None)
 
+
+def parse_purl(purl):
+    """
+    Finds the purl in the body of the Eiffel event message and parses it
+    :param purl: the purl from the Eiffel ArtC event
+    :return: tuple: the artifact filename and the substring from the build path
+    """
+    artifact_filename_and_build = purl.split("/")[-1]
+    artifact_filename = artifact_filename_and_build.split("@")[0]
+    build_path_substring = purl.split("pkg:")[1].split("/artifacts")[0]
+    return artifact_filename, build_path_substring
