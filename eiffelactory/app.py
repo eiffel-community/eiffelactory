@@ -3,7 +3,6 @@ import signal
 import sys
 
 from kombu.utils import json
-
 from artifactory import find_artifact_on_artifactory
 from config import Config
 from eiffel import *
@@ -56,7 +55,7 @@ class App(object):
 
             LOGGER_PUBLISHED.info(json.dumps(artifact_published_event))
             # commented out since we don't have publish permission yet
-            # self.rmq_connection.publish_message(json.dumps(artifact_published_event))
+            self.rmq_connection.publish_message(json.dumps(artifact_published_event))
 
     def run(self):
         self.rmq_connection.read_messages()
