@@ -42,20 +42,33 @@ class App(object):
         artifact = find_artifact_on_artifactory(*parse_purl(artc_data_identity))
 
         if artifact:
-            artifact = artifact[0]
-            LOGGER_ARTIFACTS.info(artifact)
+            if len(artifact) > 1:
+                LOGGER_ARTIFACTS.error("AQL query returned %s artifacts",
+                                       len(artifact))
+                # this is here temporarily, we need to make sure that the AQL
+                # query works as expected. We shouldn't get more than one event,
+                # but for now if we do, we want to send ArtP for all of them.
+                # This will later be replaces by a return statement instead
+                for art in artifact:
+                    self._publish_artp_event(artc_meta_id, art)
+            else:
+                self._publish_artp_event(artc_meta_id, artifact[0])
 
-            location = '%s/%s/%s/%s' % (CFG.artifactory.url,
-                                        artifact['repo'],
-                                        artifact['path'],
-                                        artifact['name'])
+    def _publish_artp_event(self, artc_meta_id, artifact):
+        LOGGER_ARTIFACTS.info(artifact)
 
-            artifact_published_event = create_artifact_published_event(
-                artc_meta_id, [Location(location)])
+        location = '%s/%s/%s/%s' % (CFG.artifactory.url,
+                                    artifact['repo'],
+                                    artifact['path'],
+                                    artifact['name'])
 
-            LOGGER_PUBLISHED.info(json.dumps(artifact_published_event))
-            # commented out since we don't have publish permission yet
-            self.rmq_connection.publish_message(json.dumps(artifact_published_event))
+        artifact_published_event = create_artifact_published_event(
+            artc_meta_id, [Location(location)])
+
+        LOGGER_PUBLISHED.info(json.dumps(artifact_published_event))
+        # commented out since we don't have publish permission yet
+        self.rmq_connection.publish_message(
+            json.dumps(artifact_published_event))
 
     def run(self):
         self.rmq_connection.read_messages()
