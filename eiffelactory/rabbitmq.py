@@ -1,30 +1,15 @@
 """
 Module for sending and receiving messages from RabbitMQ.
 """
-import configparser
 import signal
 import sys
 
 from kombu import Connection, Exchange, Queue
 from kombu.utils import json
 
-CONFIG = configparser.ConfigParser()
-CONFIG.read('../rabbitmq.config')
-RMQ_SECTION = CONFIG["rabbitmq"]
+from config import Config
 
-USERNAME = RMQ_SECTION.get('username')
-PASSWORD = RMQ_SECTION.get('password')
-HOST = RMQ_SECTION.get('host')
-PORT = RMQ_SECTION.getint('port')
-VHOST = RMQ_SECTION.get('vhost')
-EXCHANGE = RMQ_SECTION.get('exchange')
-EXCHANGE_TYPE = RMQ_SECTION.get('exchange_type')
-ROUTING_KEY = RMQ_SECTION.get('routing_key')
-QUEUE = RMQ_SECTION.get('queue')
-PREFETCH_COUNT = RMQ_SECTION.getint("prefetch_count", 200)
-
-EIFFEL_EXCHANGE = Exchange(EXCHANGE)
-EIFFEL_QUEUE = Queue(QUEUE, routing_key=ROUTING_KEY)
+CFG = Config().rabbitmq
 
 
 class RabbitMQConnection:
@@ -34,19 +19,23 @@ class RabbitMQConnection:
     def __init__(self, message_callback):
         self.message_callback = message_callback
 
+        self.exchange = Exchange(CFG.exchange)
+        self.queue = Queue(CFG.queue, routing_key=CFG.routing_key)
+
         self.connection = Connection(transport='amqp',
-                                     hostname=HOST,
-                                     port=PORT,
-                                     userid=USERNAME,
-                                     password=PASSWORD,
-                                     virtual_host=VHOST,
+                                     hostname=CFG.host,
+                                     port=CFG.port,
+                                     userid=CFG.username,
+                                     password=CFG.password,
+                                     virtual_host=CFG.vhost,
                                      ssl=True)
+
         self.connection.connect()
         self.producer = self.connection.Producer(serializer='json')
         self.consumer = self.connection.Consumer(
-            EIFFEL_QUEUE,
+            self.queue,
             callbacks=[self.handle_message],
-            prefetch_count=PREFETCH_COUNT)
+            prefetch_count=CFG.prefetch_count)
 
         self.consuming = True
         signal.signal(signal.SIGINT, self.signal_handler)
@@ -84,8 +73,8 @@ class RabbitMQConnection:
                                   'interval_max': 30,
                                   'max_retries': 30,
                               },
-                              exchange=EIFFEL_EXCHANGE,
-                              routing_key=ROUTING_KEY)
+                              exchange=self.exchange,
+                              routing_key=CFG.routing_key)
 
     def read_messages(self):
         """

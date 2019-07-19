@@ -2,45 +2,24 @@
 Module for querying Artifactory to confirm the presence of the artifacts from
 the received Eiffel ArtC events.
 """
-import configparser
-import requests
-from requests.auth import HTTPBasicAuth
-from kombu.utils import json
+import logging
 
-CONFIG = configparser.ConfigParser()
-CONFIG.read('../rabbitmq.config')
-AF_SECTION = CONFIG['artifactory']
+import requests
+from kombu.utils import json
+from requests.auth import HTTPBasicAuth
+
+from config import Config
+
+LOGGER = logging.getLogger('artifacts')
+
+CONFIG = Config().artifactory
+
+ARTIFACTORY_SEARCH_URL = CONFIG.url + '/api/search/aql/'
 
 AQL_DOMAIN_SEARCH_STRING = \
     'items.find({{"$or":[{{"artifact.name":"{}"}},{{"name":"{}"}}],' \
     '"artifact.module.build.url":{{"$match":"*{}*"}}}}).' \
     'include("name","repo","path")'
-ARTIFACTORY_URL = AF_SECTION.get('url')
-ARTIFACTORY_SEARCH_URL = ARTIFACTORY_URL + '/api/search/aql/'
-ARTIFACTORY_USER = AF_SECTION.get('username')
-ARTIFACTORY_PASSWORD = AF_SECTION.get('password')
-
-
-def find_artifact(body):
-    """
-    Identifies if the received message is an ArtC and proceeds with parsing it
-    and sending an AQL query to Artifactory
-    :param body: the body of the received RabbitMQ messages
-    """
-    purl = body['data']['identity']
-    find_artifact_on_artifactory(*parse_purl(purl))
-
-
-def parse_purl(purl):
-    """
-    Finds the purl in the body of the Eiffel event message and parses it
-    :param purl: the purl from the Eiffel ArtC event
-    :return: tuple: the artifact filename and the substring from the build path
-    """
-    artifact_filename_and_build = purl.split("/")[-1]
-    artifact_filename = artifact_filename_and_build.split("@")[0]
-    build_path_substring = purl.split("pkg:")[1].split("/artifacts")[0]
-    return artifact_filename, build_path_substring
 
 
 def find_artifact_on_artifactory(artifact_filename, build_path_substring):
@@ -55,15 +34,16 @@ def find_artifact_on_artifactory(artifact_filename, build_path_substring):
     query_string = AQL_DOMAIN_SEARCH_STRING.format(artifact_filename,
                                                    artifact_filename,
                                                    build_path_substring)
+    LOGGER.debug(query_string)
 
-    # print(query_string)
     response = requests.post(ARTIFACTORY_SEARCH_URL,
-                             auth=HTTPBasicAuth(ARTIFACTORY_USER,
-                                                ARTIFACTORY_PASSWORD),
+                             auth=HTTPBasicAuth(CONFIG.username,
+                                                CONFIG.password),
                              data=query_string)
 
     if response.status_code == 200:
         content = response.content.decode('utf-8')
         json_content = json.loads(content)
         results = json_content['results']
+        LOGGER.debug(results)
         return results

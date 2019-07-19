@@ -1,53 +1,55 @@
-import configparser
 import logging
+
 from kombu.utils import json
 
-from artifactory import find_artifact
+from artifactory import find_artifact_on_artifactory
+from config import Config
 from eiffel import *
 from rabbitmq import RabbitMQConnection
-from utils import setup_logger
+from utils import setup_logger, parse_purl
 
 setup_logger('received', 'received.log', logging.INFO)
-setup_logger('artifacts', 'artifacts.log', logging.INFO)
+setup_logger('artifacts', 'artifacts.log', logging.DEBUG)
 setup_logger('published', 'published.log', logging.INFO)
 
 LOGGER_ARTIFACTS = logging.getLogger('artifacts')
 LOGGER_PUBLISHED = logging.getLogger('published')
 LOGGER_RECEIVED = logging.getLogger('received')
 
-CONFIG = configparser.ConfigParser()
-CONFIG.read('../rabbitmq.config')
-AF_SECTION = CONFIG['artifactory']
-RMQ_SECTION = CONFIG['rabbitmq']
-EA_SECTION = CONFIG['eiffelactory']
-
-ARTIFACT_URL = AF_SECTION.get('url')
-EVENT_SOURCES = EA_SECTION.get('event_sources', '').replace(' ', '').split()
+CFG = Config()
 
 
 class App(object):
 
     def __init__(self):
-        self.rmq_connection = RabbitMQConnection(self.on_message_received)
+        self.rmq_connection = RabbitMQConnection(self.on_event_received)
 
-    def on_message_received(self, event_json):
-        if not is_artifact_created_event(event_json):
+    def on_event_received(self, event):
+        if not is_artifact_created_event(event):
             return
 
-        if EVENT_SOURCES:
-            if not is_event_sent_from_sources(event_json, EVENT_SOURCES):
+        LOGGER_RECEIVED.info(event)
+
+        if CFG.eiffelactory.event_sources:
+            if not is_event_sent_from_sources(
+                    event, CFG.eiffelactory.event_sources):
                 return
 
-        LOGGER_RECEIVED.info(event_json)
+        artc_meta_id = event['meta']['id']
+        artc_data_identity = event['data']['identity']
 
-        artc_event_id = event_json['meta']['id']
-        artifact = find_artifact(event_json)
+        artifact = find_artifact_on_artifactory(*parse_purl(artc_data_identity))
 
         if artifact:
             LOGGER_ARTIFACTS.info(artifact + '\n\n')
 
-            location = '%s/%s/%s/%s' % (ARTIFACT_URL, artifact.repo, artifact.path, artifact.name)
-            artifact_published_event = create_artifact_published_event(artc_event_id, [Location(location)])
+            location = '%s/%s/%s/%s' % (CFG.artifactory.url,
+                                        artifact.repo,
+                                        artifact.path,
+                                        artifact.name)
+
+            artifact_published_event = create_artifact_published_event(
+                artc_meta_id, [Location(location)])
 
             LOGGER_PUBLISHED.info(json.dumps(artifact_published_event))
             # commented out since we don't have publish permission yet
