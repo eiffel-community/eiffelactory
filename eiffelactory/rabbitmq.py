@@ -9,11 +9,6 @@ from config import Config
 # we can't declare new Exchanges yet so comment it out for now
 CFG = Config().rabbitmq
 
-EIFFEL_EXCHANGE = Exchange(CFG.exchange,
-                           # durable=True,
-                           # delivery_mode="persistent"
-                           )
-
 
 class RabbitMQConnection:
     """
@@ -38,7 +33,7 @@ class RabbitMQConnection:
                            name=CFG.queue,
                            routing_key=CFG.routing_key)
         self.queue.declare()
-        self.queue.bind_to(exchange=EIFFEL_EXCHANGE,
+        self.queue.bind_to(exchange=Exchange(CFG.exchange),
                            routing_key=CFG.routing_key)
         self.consumer = self.connection.\
             Consumer(
