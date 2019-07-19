@@ -42,12 +42,13 @@ class App(object):
         artifact = find_artifact_on_artifactory(*parse_purl(artc_data_identity))
 
         if artifact:
-            LOGGER_ARTIFACTS.info(artifact + '\n\n')
+            artifact = artifact[0]
+            LOGGER_ARTIFACTS.info(artifact)
 
             location = '%s/%s/%s/%s' % (CFG.artifactory.url,
-                                        artifact.repo,
-                                        artifact.path,
-                                        artifact.name)
+                                        artifact['repo'],
+                                        artifact['path'],
+                                        artifact['name'])
 
             artifact_published_event = create_artifact_published_event(
                 artc_meta_id, [Location(location)])
