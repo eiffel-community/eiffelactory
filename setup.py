@@ -5,4 +5,5 @@ setup(name='Eiffelactory',
       description='Broadcasts EiffelArtifactPublishedEvent to a RabbitMQ message bus',
       url="http://github.com/Hedenius/eiffelactory",
       license='MIT',
-      packages=['eiffelactory'])
+      packages=['eiffelactory'],
+      test_suite='tests')
