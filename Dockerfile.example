@@ -1,0 +1,16 @@
+FROM python:3.6-slim
+
+WORKDIR /app
+
+COPY . /app
+
+# Uncomment and add your proxy settings if needed. Otherwise you may not
+# be able to connect to pypi.python.org when running the pip install command.
+#ENV http_proxy http://myproxy:1234
+#ENV https_proxy http://myproxy:1234
+
+EXPOSE 15671
+
+RUN pip install --trusted-host pypi.python.org -r requirements.txt
+
+CMD ["python3", "main.py"]

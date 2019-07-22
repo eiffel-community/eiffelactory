@@ -1,0 +1,19 @@
+version: "3.1"
+
+services:
+  eiffelactory:
+    image: eiffelactory:latest
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "15671:15671"
+    networks:
+      - eiffelactorynet
+networks:
+  eiffelactorynet:

@@ -1,0 +1,29 @@
+# Git
+.git
+.gitignore
+README.md
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Example files
+*.example
+
+# IntelliJ
+.idea/
+
+# Python
+__pycache__/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# License
+LICENSE
