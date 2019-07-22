@@ -4,7 +4,7 @@ Config module for prettier logging across the classes in the app
 import configparser
 
 CONFIG = configparser.ConfigParser()
-CONFIG.read('../eiffelactory.config')
+CONFIG.read('eiffelactory.config')
 
 CONFIG_RABBITMQ = CONFIG['rabbitmq']
 CONFIG_ARTIFACTORY = CONFIG['artifactory']

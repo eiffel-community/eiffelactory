@@ -4,10 +4,10 @@ Module for sending and receiving messages from RabbitMQ.
 from kombu import Connection, Exchange, Queue
 from kombu.utils import json
 
-from config import Config
+from eiffelactory import config
 
 # we can't declare new Exchanges yet so comment it out for now
-CFG = Config().rabbitmq
+CFG = config.Config().rabbitmq
 
 
 class RabbitMQConnection:

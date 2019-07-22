@@ -8,10 +8,10 @@ import requests
 from requests.auth import HTTPBasicAuth
 from kombu.utils import json
 
-from config import Config
+from eiffelactory import config
 
 LOGGER = logging.getLogger('artifacts')
-CONFIG = Config().artifactory
+CONFIG = config.Config().artifactory
 ARTIFACTORY_SEARCH_URL = CONFIG.url + '/api/search/aql/'
 AQL_DOMAIN_SEARCH_STRING = \
     'items.find({{"$or":[{{"artifact.name":"{}"}},{{"name":"{}"}}],' \

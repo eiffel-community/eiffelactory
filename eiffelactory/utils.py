@@ -17,7 +17,7 @@ def generate_uuid():
 
 
 def setup_logger(logname, filename, level=logging.WARNING):
-    handler = logging.FileHandler("../logs/%s" % filename)
+    handler = logging.FileHandler("logs/%s" % filename)
     logger = logging.getLogger(logname)
     logger.setLevel(level)
     logger.addHandler(handler)

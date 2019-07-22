@@ -4,7 +4,7 @@ Eiffel events should be created using the corresponding create_<event>() method.
 All Eiffel model classes inherit from dict for easy json serialization.
 """
 
-from utils import current_time_millis, generate_uuid, remove_none_from_dict
+from eiffelactory import utils
 
 # Eiffel event types
 EIFFEL_ARTIFACT_PUBLISHED_EVENT = "EiffelArtifactPublishedEvent"
@@ -43,7 +43,8 @@ class Meta(dict):
 
     def __init__(self,
                  event_type, version,
-                 event_id=generate_uuid(), time=current_time_millis(),
+                 event_id=utils.generate_uuid(),
+                 time=utils.current_time_millis(),
                  tags=None, source=None):
 
         super().__init__(self,
@@ -141,7 +142,7 @@ def create_artifact_published_event(artc_event_id, locations):
 
     event = Event(data, links, meta)
 
-    return remove_none_from_dict(event)
+    return utils.remove_none_from_dict(event)
 
 
 def is_eiffel_event_type(event, event_type):

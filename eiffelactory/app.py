@@ -7,22 +7,21 @@ import signal
 import sys
 
 from kombu.utils import json
-from artifactory import find_artifact_on_artifactory
-from config import Config
-from eiffel import Location, create_artifact_published_event, \
-    is_sent_from_sources, is_artifact_created_event
-from rabbitmq import RabbitMQConnection
-from utils import setup_logger, parse_purl
+from eiffelactory import artifactory
+from eiffelactory import config
+from eiffelactory import eiffel
+from eiffelactory import rabbitmq
+from eiffelactory import utils
 
-setup_logger('received', 'received.log', logging.INFO)
-setup_logger('artifacts', 'artifacts.log', logging.DEBUG)
-setup_logger('published', 'published.log', logging.INFO)
+utils.setup_logger('received', 'received.log', logging.INFO)
+utils.setup_logger('artifacts', 'artifacts.log', logging.DEBUG)
+utils.setup_logger('published', 'published.log', logging.INFO)
 
 LOGGER_ARTIFACTS = logging.getLogger('artifacts')
 LOGGER_PUBLISHED = logging.getLogger('published')
 LOGGER_RECEIVED = logging.getLogger('received')
 
-CFG = Config()
+CFG = config.Config()
 
 
 class App:
@@ -31,7 +30,8 @@ class App:
     events
     """
     def __init__(self):
-        self.rmq_connection = RabbitMQConnection(self.on_event_received)
+        self.rmq_connection = rabbitmq.RabbitMQConnection(
+            self.on_event_received)
         signal.signal(signal.SIGINT, self._signal_handler)
 
     def on_event_received(self, event):
@@ -41,19 +41,21 @@ class App:
         :param event: RabbitMQ message
         :return:
         """
-        if not is_artifact_created_event(event):
+        if not eiffel.is_artifact_created_event(event):
             return
 
         LOGGER_RECEIVED.info(event)
 
         if CFG.eiffelactory.event_sources:
-            if not is_sent_from_sources(event, CFG.eiffelactory.event_sources):
+            if not eiffel.is_sent_from_sources(
+                    event, CFG.eiffelactory.event_sources):
                 return
 
         artc_meta_id = event['meta']['id']
         artc_data_identity = event['data']['identity']
 
-        artifact = find_artifact_on_artifactory(*parse_purl(artc_data_identity))
+        artifact = artifactory.\
+            find_artifact_on_artifactory(*utils.parse_purl(artc_data_identity))
 
         if artifact:
             if len(artifact) > 1:
@@ -82,8 +84,8 @@ class App:
                                     artifact['path'],
                                     artifact['name'])
 
-        artifact_published_event = create_artifact_published_event(
-            artc_meta_id, [Location(location)])
+        artifact_published_event = eiffel.create_artifact_published_event(
+            artc_meta_id, [eiffel.Location(location)])
 
         LOGGER_PUBLISHED.info(json.dumps(artifact_published_event))
         # commented out since we don't have publish permission yet
@@ -108,8 +110,3 @@ class App:
         self.rmq_connection.close_connection()
         print("\nExiting")
         sys.exit(0)
-
-
-if __name__ == "__main__":
-    APP = App()
-    APP.run()
