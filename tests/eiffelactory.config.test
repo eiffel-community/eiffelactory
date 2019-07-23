@@ -1,0 +1,19 @@
+[rabbitmq]
+username = rmq_username
+password = rmq_password
+host = rmq_host
+port = 1234
+vhost = rmq_vhost
+exchange = rmq_exchange
+exchange_type = rmq_exchange_type
+routing_key = rmq_routing_key
+queue = rmq_queue
+prefetch_count = 1234
+
+[artifactory]
+url = https://localhost:8081/artifactory
+username = artifactory_username
+password = artifactory_password
+
+[eiffelactory]
+event_sources = JENKINS_EIFFEL_BROADCASTER, EVENT-source_2, eventSource3

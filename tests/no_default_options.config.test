@@ -1,0 +1,13 @@
+[rabbitmq]
+username = rmq_username
+password = rmq_password
+host = rmq_host
+port = 1234
+exchange = rmq_exchange
+exchange_type = rmq_exchange_type
+queue = rmq_queue
+
+[artifactory]
+url = https://localhost:8081/artifactory
+username = artifactory_username
+password = artifactory_password
