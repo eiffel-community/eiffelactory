@@ -6,7 +6,10 @@ from eiffelactory import eiffel
 class EiffelTestCase(unittest.TestCase):
 
     def test__create_artifact_published_meta(self):
-        pass
+        meta = eiffel._create_artifact_published_meta()
+        self.assertEqual(meta['type'], 'EiffelArtifactPublishedEvent')
+        self.assertEqual(meta['version'], '3.0.0')
+        self.assertEqual(meta['source']['name'], 'EIFFELACTORY')
 
     def test_create_eiffel_published_event(self):
         artc_meta_id = '5de6f82d-52b6-44ae-bdbb-0be4fc213184'
@@ -16,19 +19,38 @@ class EiffelTestCase(unittest.TestCase):
                                                        [eiffel.Location(
                                                            location)])
 
-        assert (event['meta']['type'] == 'EiffelArtifactPublishedEvent')
-        assert (event['links'][0]['type'] == 'ARTIFACT')
-        assert (event['links'][0]['target'] ==
-                '5de6f82d-52b6-44ae-bdbb-0be4fc213184')
-        assert (event['data']['locations'][0]['type'] == 'ARTIFACTORY')
-        assert (event['data']['locations'][0]['uri'] ==
-                'https://some.location/some-repo/some-path/artifact.txt')
+        self.assertEqual(event['meta']['type'], 'EiffelArtifactPublishedEvent')
+        self.assertEqual(event['links'][0]['type'], 'ARTIFACT')
+        self.assertEqual(event['links'][0]['target'],
+                         '5de6f82d-52b6-44ae-bdbb-0be4fc213184')
+        self.assertEqual(event['data']['locations'][0]['type'], 'ARTIFACTORY')
+        self.assertEqual(event['data']['locations'][0]['uri'],
+                         'https://some.location/some-repo/'
+                         'some-path/artifact.txt')
 
     def test_is_eiffel_event_type(self):
-        pass
+        event = {'links': [],
+                 'meta': {
+                     'version': '2.0.0',
+                     'time': 1563540212984,
+                     'type': 'EiffelArtifactCreatedEvent',
+                     'id': '3cb709fa-3ae8-4d6e-bdf4-cf86h654gf5e'},
+                 'data': {
+                     'identity': 'pkg:job/DIR/job/DIR/job/DIR/job/'
+                                 'PROJECT/8/artifacts/whatever.zip@8'}}
+        event_type = 'EiffelArtifactCreatedEvent'
+        self.assertTrue(eiffel.is_eiffel_event_type(event, event_type))
 
     def test_is_artifact_created_event(self):
-        pass
+        event = {'links': [],
+                 'meta': {
+                     'version': '2.0.0',
+                     'time': 1563540212984,
+                     'type': 'EiffelArtifactCreatedEvent',
+                     'id': '3cb709fa-3ae8-4d6e-bdf4-cf86h654gf5e'},
+                 'data': {
+                     'identity': 'pkg:job/DIR/job/DIR/job/DIR/job/PROJECT/8/artifacts/whatever.zip@8'}}
+        self.assertTrue(eiffel.is_artifact_created_event(event))
 
     def test_is_event_sent_from_sources(self):
         with_source_name = eiffel.Meta(eiffel.EIFFEL_ARTIFACT_CREATED_EVENT,
@@ -54,15 +76,15 @@ class EiffelTestCase(unittest.TestCase):
         event3 = {'data': {}, 'links': [], 'meta': without_source}
         event4 = {'data': {}, 'links': [], 'meta': without_source_name}
 
-        assert (eiffel.is_sent_from_sources(
+        self.assertTrue(eiffel.is_sent_from_sources(
             event1, ['JENKINS_EIFFEL_BROADCASTER']))
-        assert (eiffel.is_sent_from_sources(
+        self.assertTrue(eiffel.is_sent_from_sources(
             event2, ['JENKINS_EIFFEL_BROADCASTER', 'OTHER_SOURCE']))
-        assert (not eiffel.is_sent_from_sources(
+        self.assertFalse(eiffel.is_sent_from_sources(
             event2, ['JENKINS_EIFFEL_BROADCASTER']))
-        assert (not eiffel.is_sent_from_sources(
+        self.assertFalse(eiffel.is_sent_from_sources(
             event3, ['JENKINS_EIFFEL_BROADCASTER']))
-        assert (not eiffel.is_sent_from_sources(
+        self.assertFalse(eiffel.is_sent_from_sources(
             event4, ['JENKINS_EIFFEL_BROADCASTER']))
 
 
