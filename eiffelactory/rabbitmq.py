@@ -6,7 +6,6 @@ from kombu.utils import json
 
 from eiffelactory import config
 
-# we can't declare new Exchanges yet so comment it out for now
 CFG = config.Config().rabbitmq
 
 
