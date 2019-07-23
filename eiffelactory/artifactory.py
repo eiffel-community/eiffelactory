@@ -13,10 +13,27 @@ from eiffelactory import config
 LOGGER = logging.getLogger('artifacts')
 CONFIG = config.Config().artifactory
 ARTIFACTORY_SEARCH_URL = CONFIG.url + '/api/search/aql/'
-AQL_DOMAIN_SEARCH_STRING = \
-    'items.find({{"$or":[{{"artifact.name":"{}"}},{{"name":"{}"}}],' \
-    '"artifact.module.build.url":{{"$match":"*{}*"}}}}).' \
-    'include("name","repo","path")'
+AQL_DOMAIN_SEARCH_STRING = CONFIG.aql_search_string
+
+
+def _format_aql_query(artifact_filename, build_path_substring):
+    return AQL_DOMAIN_SEARCH_STRING.format(
+        artifact_name=artifact_filename,
+        build_path_substring=build_path_substring).replace('\n', '')
+
+
+def _execute_aql_query(query_string):
+    response = requests.post(ARTIFACTORY_SEARCH_URL,
+                             auth=HTTPBasicAuth(CONFIG.username,
+                                                CONFIG.password),
+                             data=query_string)
+    content = response.content.decode('utf-8')
+    if response.status_code == 200:
+        return content
+    LOGGER.error("Failure when connecting to Artifactory. "
+                 "Response code: %d\nReason:\n%s",
+                 response.status_code, content)
+    return None
 
 
 def find_artifact_on_artifactory(artifact_filename, build_path_substring):
@@ -28,23 +45,14 @@ def find_artifact_on_artifactory(artifact_filename, build_path_substring):
     :param build_path_substring: the substring from the build path
     :return:
     """
-    query_string = AQL_DOMAIN_SEARCH_STRING.format(artifact_filename,
-                                                   artifact_filename,
-                                                   build_path_substring)
+    query_string = _format_aql_query(artifact_filename, build_path_substring)
     LOGGER.debug(query_string)
 
-    response = requests.post(ARTIFACTORY_SEARCH_URL,
-                             auth=HTTPBasicAuth(CONFIG.username,
-                                                CONFIG.password),
-                             data=query_string)
+    content = _execute_aql_query(query_string)
 
-    if response.status_code == 200:
-        content = response.content.decode('utf-8')
+    if content:
         json_content = json.loads(content)
         results = json_content['results']
         LOGGER.debug(results)
         return results
-    LOGGER.error("Failure when connecting to Artifactory. "
-                 "Response code: %d\nReason:\n%s",
-                 response.status_code, response.reason)
-    return []
+    return None

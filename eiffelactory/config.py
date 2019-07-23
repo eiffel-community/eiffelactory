@@ -128,6 +128,10 @@ class ArtifactoryConfig(ConfigSection):
     def url(self):
         return self.get('url')
 
+    @property
+    def aql_search_string(self):
+        return self.get('aql_search_string')
+
 
 class EiffelactoryConfig(ConfigSection):
     """
