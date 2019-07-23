@@ -13,7 +13,7 @@ class UtilsTestCase(unittest.TestCase):
         clean = utils.remove_none_from_dict(dictionary)
 
         expected = {"test2": "not none", "test3": {"nested2": "not none"}}
-        assert (clean == expected)
+        self.assertEqual(clean, expected)
 
     def test_parse_identity_purl(self):
         purl = 'pkg:job/DEPT/job/USR/job/TEST/job/FOO/job/BAR_BAR/1234/' \
@@ -21,8 +21,8 @@ class UtilsTestCase(unittest.TestCase):
 
         filename, build_url = utils.parse_purl(purl)
 
-        assert (filename == 'some_file.txt')
-        assert (build_url ==
+        self.assertEqual(filename, 'some_file.txt')
+        self.assertEqual(build_url,
                 'job/DEPT/job/USR/job/TEST/job/FOO/job/BAR_BAR/1234')
 
 
