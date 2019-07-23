@@ -1,4 +1,4 @@
-FROM python:3.6-slim
+FROM python:3.5-slim
 
 WORKDIR /app
 
@@ -8,8 +8,6 @@ COPY . /app
 # be able to connect to pypi.python.org when running the pip install command.
 #ENV http_proxy http://myproxy:1234
 #ENV https_proxy http://myproxy:1234
-
-EXPOSE 15671
 
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
 

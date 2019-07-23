@@ -1,4 +1,4 @@
-version: "3.1"
+version: "3.7"
 
 services:
   eiffelactory:
@@ -11,8 +11,6 @@ services:
           memory: 50M
       restart_policy:
         condition: on-failure
-    ports:
-      - "15671:15671"
     networks:
       - eiffelactorynet
 networks:
