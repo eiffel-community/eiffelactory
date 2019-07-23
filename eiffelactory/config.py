@@ -43,7 +43,7 @@ class ConfigSection:
     def __init__(self, section):
         self.section = section
 
-    def get(self, key, default=''):
+    def get(self, key, default=None):
         return self.section.get(key, fallback=default)
 
     def getint(self, key, default=None):
@@ -144,4 +144,7 @@ class EiffelactoryConfig(ConfigSection):
 
     @property
     def event_sources(self):
-        return self.get('event_sources').replace(' ', '').split(',')
+        event_sources = self.get('event_sources')
+        if event_sources:
+            return event_sources.replace(' ', '').split(',')
+        return None
