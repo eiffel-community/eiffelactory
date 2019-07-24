@@ -49,7 +49,7 @@ class Meta(dict):
                  event_type, version,
                  tags=None, source=None):
 
-        event_id = utils.generate_uuid(),
+        event_id = utils.generate_uuid()
         time = utils.current_time_millis()
 
         super().__init__(self,
