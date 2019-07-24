@@ -18,11 +18,6 @@ class ConfigTestCase(unittest.TestCase):
         self.assertEqual(event_sources[1], "EVENT-source_2")
         self.assertEqual(event_sources[2], "eventSource3")
 
-    def test_missing_event_sources_should_be_empty_list(self):
-        event_sources = self.no_default_options.eiffelactory.event_sources
-
-        self.assertIs(event_sources, None)
-
     def test_returns_default_values_if_option_is_missing(self):
         cfg = self.no_default_options
         defaults = config.DEFAULT_CONFIG_OPTIONS
@@ -38,6 +33,7 @@ class ConfigTestCase(unittest.TestCase):
 
     def test_missing_sections_are_added(self):
         cfg = self.no_default_options
+
         self.assertTrue(cfg._config.has_section('eiffelactory'))
 
     def test_port_is_int(self):
