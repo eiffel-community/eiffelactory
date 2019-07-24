@@ -5,6 +5,7 @@ events
 import logging
 import signal
 import sys
+import os
 
 from kombu.utils import json
 from eiffelactory import artifactory
@@ -12,6 +13,9 @@ from eiffelactory import config
 from eiffelactory import eiffel
 from eiffelactory import rabbitmq
 from eiffelactory import utils
+
+if not os.path.exists('logs'):
+    os.makedirs('logs')
 
 utils.setup_logger('received', 'received.log', logging.INFO)
 utils.setup_logger('artifacts', 'artifacts.log', logging.DEBUG)
