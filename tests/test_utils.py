@@ -3,7 +3,7 @@ import unittest
 from eiffelactory import utils
 
 
-class UtilsTestCase(unittest.TestCase):
+class TestUtils(unittest.TestCase):
 
     def test_remove_none_from_dict(self):
         dictionary = {"test": None,

@@ -3,7 +3,7 @@ import unittest
 from eiffelactory import eiffel
 
 
-class EiffelTestCase(unittest.TestCase):
+class TestEiffel(unittest.TestCase):
 
     def test_create_eiffel_published_event(self):
         artc_meta_id = '5de6f82d-52b6-44ae-bdbb-0be4fc213184'

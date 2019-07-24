@@ -2,7 +2,7 @@ import unittest
 from eiffelactory import config
 
 
-class ConfigTestCase(unittest.TestCase):
+class TestConfig(unittest.TestCase):
 
     def setUp(self):
         self.config = config.Config("tests/all_options.config")
