@@ -81,20 +81,21 @@ class App:
         :param artifact: the results dictionary returned from Artifactory by the
         AQL query.
         """
-        LOGGER_ARTIFACTS.info(artifact)
 
         location = '%s/%s/%s/%s' % (CFG.artifactory.url,
                                     artifact['repo'],
                                     artifact['path'],
                                     artifact['name'])
 
-        artifact_published_event = eiffel.create_artifact_published_event(
+        artp_event = eiffel.create_artifact_published_event(
             artc_meta_id, [eiffel.Location(location)])
 
-        LOGGER_PUBLISHED.info(json.dumps(artifact_published_event))
-        # commented out since we don't have publish permission yet
-        self.rmq_connection.publish_message(
-            json.dumps(artifact_published_event))
+        artp_event_json = json.dumps(utils.remove_none_from_dict(artp_event))
+
+        self.rmq_connection.publish_message(artp_event_json)
+
+        LOGGER_ARTIFACTS.info(artifact)
+        LOGGER_PUBLISHED.info(artp_event_json)
 
     def run(self):
         """
