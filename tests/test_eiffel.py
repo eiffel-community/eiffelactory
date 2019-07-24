@@ -5,12 +5,6 @@ from eiffelactory import eiffel
 
 class EiffelTestCase(unittest.TestCase):
 
-    def test__create_artifact_published_meta(self):
-        meta = eiffel._create_artifact_published_meta()
-        self.assertEqual(meta['type'], 'EiffelArtifactPublishedEvent')
-        self.assertEqual(meta['version'], '3.0.0')
-        self.assertEqual(meta['source']['name'], 'EIFFELACTORY')
-
     def test_create_eiffel_published_event(self):
         artc_meta_id = '5de6f82d-52b6-44ae-bdbb-0be4fc213184'
         location = 'https://some.location/some-repo/some-path/artifact.txt'
@@ -20,6 +14,8 @@ class EiffelTestCase(unittest.TestCase):
                                                            location)])
 
         self.assertEqual(event['meta']['type'], 'EiffelArtifactPublishedEvent')
+        self.assertEqual(event['meta']['version'], '3.0.0')
+        self.assertEqual(event['meta']['source']['name'], 'EIFFELACTORY')
         self.assertEqual(event['links'][0]['type'], 'ARTIFACT')
         self.assertEqual(event['links'][0]['target'],
                          '5de6f82d-52b6-44ae-bdbb-0be4fc213184')
@@ -39,6 +35,7 @@ class EiffelTestCase(unittest.TestCase):
                      'identity': 'pkg:job/DIR/job/DIR/job/DIR/job/'
                                  'PROJECT/8/artifacts/whatever.zip@8'}}
         event_type = 'EiffelArtifactCreatedEvent'
+
         self.assertTrue(eiffel.is_eiffel_event_type(event, event_type))
 
     def test_is_artifact_created_event(self):
@@ -49,7 +46,9 @@ class EiffelTestCase(unittest.TestCase):
                      'type': 'EiffelArtifactCreatedEvent',
                      'id': '3cb709fa-3ae8-4d6e-bdf4-cf86h654gf5e'},
                  'data': {
-                     'identity': 'pkg:job/DIR/job/DIR/job/DIR/job/PROJECT/8/artifacts/whatever.zip@8'}}
+                     'identity': 'pkg:job/DIR/job/DIR/job/DIR/job/PROJECT/8/'
+                                 'artifacts/whatever.zip@8'}}
+
         self.assertTrue(eiffel.is_artifact_created_event(event))
 
     def test_is_event_sent_from_sources(self):

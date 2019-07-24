@@ -7,6 +7,7 @@ Parameter and class descriptions are often taken verbatim or shortened from
 the official Eiffel documentation found here:
 https://github.com/eiffel-community/eiffel
 """
+import uuid
 
 from eiffelactory import utils
 
@@ -45,17 +46,18 @@ class Meta(dict):
     :param source: a description of the source of the event
     """
 
-    def __init__(self,
-                 event_type, version,
-                 tags=None, source=None):
+    def __init__(self, event_type, version, tags=None, source=None):
 
-        event_id = utils.generate_uuid()
+        event_id = str(uuid.uuid4())
         time = utils.current_time_millis()
 
         super().__init__(self,
-                         id=event_id, type=event_type,
-                         version=version, time=time,
-                         tags=tags, source=source)
+                         id=event_id,
+                         type=event_type,
+                         version=version,
+                         time=time,
+                         tags=tags,
+                         source=source)
 
 
 class Source(dict):
@@ -72,13 +74,18 @@ class Source(dict):
     """
 
     def __init__(self,
-                 domain_id=None, host=None,
-                 name=None, serializer=None,
+                 domain_id=None,
+                 host=None,
+                 name=EIFFELACTORY,
+                 serializer=None,
                  uri=None):
 
         super().__init__(self,
-                         domainId=domain_id, host=host,
-                         name=name, serializer=serializer, uri=uri)
+                         domainId=domain_id,
+                         host=host,
+                         name=name,
+                         serializer=serializer,
+                         uri=uri)
 
 
 class Link(dict):
@@ -120,34 +127,21 @@ class Location(dict):
         super().__init__(self, type=location_type, uri=uri)
 
 
-def _create_artifact_published_meta():
-    """
-    Creates a Meta object with pre-filled ArtP data.
-    :return: Meta object with pre-filled ArtP data
-    """
-
-    source = Source(name=EIFFELACTORY)
-    return Meta(EIFFEL_ARTIFACT_PUBLISHED_EVENT, VERSION_3_0_0, source=source)
-
-
 def create_artifact_published_event(artc_event_id, locations):
     """
     Creates an EiffelArtifactPublishedEvent.
-    Removes all None values from the dict before it is returned.
-    This is because otherwise None values are converted to 'null' when
-    the dict is serialized to json.
 
     :param artc_event_id: the target id of the required ARTIFACT link
     :param locations: a list of artifact locations
-    :return: a dict that represents an EiffelArtifactPublishedEvent
+    :return: an Event object structured as an ArtP event
     """
     data = ArtifactPublishedData(locations)
     links = [Link(Link.ARTIFACT, artc_event_id)]
-    meta = _create_artifact_published_meta()
+    meta = Meta(EIFFEL_ARTIFACT_PUBLISHED_EVENT, VERSION_3_0_0, source=Source())
 
     event = Event(data, links, meta)
 
-    return utils.remove_none_from_dict(event)
+    return event
 
 
 def is_eiffel_event_type(event, event_type):
@@ -176,7 +170,7 @@ def is_sent_from_sources(event, sources):
     Checks if an event is sent from a list of source names.
     Source names are configured in eiffelactory.config.
 
-    :param event: the Eiffel event as a dict
+    :param event: the Eiffel event
     :param sources: a list of source names
     :return: True if event's meta.source.name is in the list of source names
     """
