@@ -5,9 +5,9 @@ from eiffelactory import config
 class ConfigTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.config = config.Config("tests/eiffelactory.config.test")
+        self.config = config.Config("tests/all_options.config")
         self.no_default_options = config.Config(
-            'tests/no_default_options.config.test')
+            'tests/no_default_options.config')
 
     def test_option_event_sources_should_be_parsed_to_list(self):
         event_sources = self.config.eiffelactory.event_sources
