@@ -4,19 +4,24 @@ timestamps, etc.
 """
 import logging
 import time
-import uuid
 
 
 def current_time_millis():
-    """Returns UNIX Epoch time, in milliseconds."""
+    """
+    Convenience method for getting the current time in milliseconds.
+    :return: UNIX Epoch time, in milliseconds.
+    """
     return int(round(time.time() * 1000))
 
 
-def generate_uuid():
-    return str(uuid.uuid4())
-
-
 def setup_logger(logname, filename, level=logging.WARNING):
+    """
+    Creates a logger with a file handler.
+
+    :param logname: the name of the logger
+    :param filename: the filename to log to
+    :param level: the minimum log level
+    """
     handler = logging.FileHandler("logs/%s" % filename)
     logger = logging.getLogger(logname)
     logger.setLevel(level)
@@ -24,6 +29,11 @@ def setup_logger(logname, filename, level=logging.WARNING):
 
 
 def remove_none_from_dict(dictionary):
+    """
+    Recursively removes None values from a dictionary
+    :param dictionary: the dictionary to clean
+    :return: a copy of the dictionary with None values removed
+    """
     if not isinstance(dictionary, dict):
         return dictionary
 
