@@ -15,7 +15,7 @@ _DEFAULT_AQL_SEARCH_STRING = 'items.find({{"name":"{artifact_name}",' \
                              'build_path_substring}*"}}}}).include("name",' \
                              '"repo","path")'
 
-DEFAULT_CONFIG_FILENAME = 'eiffelactory.config'
+DEFAULT_CONFIG_FILENAME = 'conf/eiffelactory.config'
 
 DEFAULT_CONFIG_OPTIONS = {
     'prefetch_count': '50',
