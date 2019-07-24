@@ -6,26 +6,17 @@ from eiffelactory import artifactory
 artifact_filename = 'artifact.txt'
 build_path_substring = 'job/TEST/job/BUILD_NAME/255'
 query_string =\
-    'items.find({' \
-    '"$or":' \
-    '[{"artifact.name":"artifact.txt"},' \
-    '{"name":"artifact.txt"}],' \
+    'items.find({"name":"artifact.txt",' \
     '"artifact.module.build.url":' \
     '{"$match":"*job/TEST/job/BUILD_NAME/255*"}}' \
     ').include("name","repo","path")'
 wrong_query_string = \
-    'items.find({' \
-    '"$or":' \
-    '[{"artifact.name":"wrong_file.txt"},' \
-    '{"name":"wrong_file.txt"}],' \
+    'items.find({"name":"wrong_file.txt",' \
     '"artifact.module.build.url":' \
     '{"$match":"*job/TEST/job/BUILD_NAME/255*"}}' \
     ').include("name","repo","path")'
 bad_query_string = \
-    'items.find({' \
-    '$or:' \
-    '[{"artifact.name":"{"file.txt"}"},' \
-    '{"name":"{"artifact.txt"}"}],' \
+    'items.find({"name":"{"file.txt"}"},' \
     '"artifact.module.build.url":' \
     '{"$match":"*{"job/TEST/job/BUILD_NAME/255"}*"}}' \
     ').include("name","repo","path")'

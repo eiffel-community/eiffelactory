@@ -5,9 +5,9 @@ from eiffelactory import config
 class ConfigTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.config = config.Config("eiffelactory.config.test")
+        self.config = config.Config("tests/eiffelactory.config.test")
         self.no_default_options = config.Config(
-            'no_default_options.config.test')
+            'tests/no_default_options.config.test')
 
     def test_option_event_sources_should_be_parsed_to_list(self):
         event_sources = self.config.eiffelactory.event_sources
@@ -53,3 +53,7 @@ class ConfigTestCase(unittest.TestCase):
     def tearDown(self):
         self.config = None
         self.no_default_options = None
+
+
+if __name__ == '__main__':
+    unittest.main()

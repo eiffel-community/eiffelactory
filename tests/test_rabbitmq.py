@@ -18,3 +18,7 @@ class TestRabbitMQ(unittest.TestCase):
 
     def tearDown(self):
         self.rabbitmq_connection = None
+
+
+if __name__ == '__main__':
+    unittest.main()
