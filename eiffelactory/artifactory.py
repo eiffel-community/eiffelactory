@@ -11,9 +11,9 @@ from kombu.utils import json
 from eiffelactory import config
 
 LOGGER = logging.getLogger('artifacts')
-CONFIG = config.Config().artifactory
-ARTIFACTORY_SEARCH_URL = CONFIG.url + '/api/search/aql/'
-AQL_DOMAIN_SEARCH_STRING = CONFIG.aql_search_string
+CFG = config.Config().artifactory
+ARTIFACTORY_SEARCH_URL = CFG.url + '/api/search/aql/'
+AQL_DOMAIN_SEARCH_STRING = CFG.aql_search_string
 
 
 def _format_aql_query(artifact_filename, build_path_substring):
@@ -24,8 +24,8 @@ def _format_aql_query(artifact_filename, build_path_substring):
 
 def _execute_aql_query(query_string):
     response = requests.post(ARTIFACTORY_SEARCH_URL,
-                             auth=HTTPBasicAuth(CONFIG.username,
-                                                CONFIG.password),
+                             auth=HTTPBasicAuth(CFG.username,
+                                                CFG.password),
                              data=query_string)
     content = response.content.decode('utf-8')
     if response.status_code == 200:
