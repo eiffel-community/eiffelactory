@@ -43,9 +43,10 @@ class Meta(dict):
 
     def __init__(self,
                  event_type, version,
-                 event_id=utils.generate_uuid(),
-                 time=utils.current_time_millis(),
                  tags=None, source=None):
+
+        event_id = utils.generate_uuid(),
+        time = utils.current_time_millis()
 
         super().__init__(self,
                          id=event_id, type=event_type,
