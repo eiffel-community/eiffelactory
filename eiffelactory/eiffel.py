@@ -2,6 +2,10 @@
 Module containing classes and methods for creating and handling Eiffel events.
 Eiffel events should be created using the corresponding create_<event>() method.
 All Eiffel model classes inherit from dict for easy json serialization.
+
+Parameter and class descriptions are often taken verbatim or shortened from
+the official Eiffel documentation found here:
+https://github.com/eiffel-community/eiffel
 """
 
 from eiffelactory import utils
@@ -37,8 +41,8 @@ class Meta(dict):
 
     :param event_type: type of event according to Eiffel specification
     :param version: Eiffel schema version
-    :param event_id: unique identity of the event in uuid format
-    :param time: event creation timestamp in milliseconds
+    :param tags: tags or keywords associated with the events
+    :param source: a description of the source of the event
     """
 
     def __init__(self,
@@ -57,7 +61,7 @@ class Meta(dict):
 class Source(dict):
     """
     Represents an Eiffel event's meta.source object.
-    Provides a description of the source of the event.
+    Provides a description of the source of the event for traceability purposes.
     Parameters with None as default value are non-required fields.
 
     :param domain_id: identifies the domain that produced an event
