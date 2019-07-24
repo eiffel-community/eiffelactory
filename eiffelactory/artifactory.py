@@ -30,8 +30,7 @@ def _execute_aql_query(query_string):
     content = response.content.decode('utf-8')
     if response.status_code == 200:
         return content
-    LOGGER.error("Failure when connecting to Artifactory. "
-                 "Response code: %d\nReason:\n%s",
+    LOGGER.error("Artifactory error: %d, %s",
                  response.status_code, content)
     return None
 
