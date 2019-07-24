@@ -1,5 +1,4 @@
 import unittest
-import configparser
 from eiffelactory import config
 
 
@@ -34,6 +33,8 @@ class ConfigTestCase(unittest.TestCase):
         self.assertIs(cfg.rabbitmq.vhost, defaults['vhost'])
         self.assertIs(cfg.rabbitmq.routing_key, defaults['routing_key'])
         self.assertIs(cfg.eiffelactory.event_sources, defaults['event_sources'])
+        self.assertIs(cfg.artifactory.aql_search_string,
+                      defaults['aql_search_string'])
 
     def test_missing_sections_are_added(self):
         cfg = self.no_default_options

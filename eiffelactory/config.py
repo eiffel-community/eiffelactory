@@ -10,14 +10,21 @@ Parses option strings into collections or other formats if needed.
 """
 import configparser
 
+_DEFAULT_AQL_SEARCH_STRING = 'items.find({{"name":"{artifact_name}",' \
+                             '"artifact.module.build.url":{{"$match":"*{' \
+                             'build_path_substring}*"}}}}).include("name",' \
+                             '"repo","path")'
+
 DEFAULT_CONFIG_FILENAME = 'eiffelactory.config'
 
 DEFAULT_CONFIG_OPTIONS = {
     'prefetch_count': '50',
     'vhost': '/',
     'routing_key': '#',
-    'event_sources': None
+    'event_sources': None,
+    'aql_search_string': _DEFAULT_AQL_SEARCH_STRING
 }
+
 
 class Config:
     """
