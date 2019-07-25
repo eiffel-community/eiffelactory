@@ -9,7 +9,7 @@ For more information about Eiffel, see https://github.com/eiffel-community/eiffe
 
 ## How it works
 
-### Consume EiffelArtifactCreatedEvent
+### Consume EiffelArtifactCreatedEvent (ArtC)
 *For more information about this event, see the [specification](https://github.com/eiffel-community/eiffel/blob/master/eiffel-vocabulary/EiffelArtifactCreatedEvent.md).*
 
 Eiffelactory can be configured to listen for messages sent to a RabbitMQ message bus. 
@@ -19,13 +19,21 @@ Users can choose to process all ArtC events or only ArtC events sent from certai
 
 #### Event source filtering
 If event source filtering is used, only ArtC events with the corresponding meta.source.name will be processed.
-Users can specify event sources in the **eiffelactory.config** file. 
+Users can specify event sources in the *eiffelactory.config* file. 
 
-#### The data.identity PURL
-Eiffelactory parses the data.identity purl to extract information about the created 
-artifact. 
+#### The data.identity purl
+Eiffelactory parses the data.identity [purl](https://github.com/package-url/purl-spec) in an 
+ArtC event in order to extract information about the created artifact. 
 
-*TODO: Describe what information is extracted and how*
+*data.identity purl example:*
+```
+pkg:job/TEST/job/username.project/123/artifacts/eiffelactory.txt@123
+```
+
+After parsing the purl above `artifact_name` will be *"eiffelactory.txt"* and 
+`build_path_substring` will be *"job/TEST/job/username.project/123"*.
+
+Both pieces of information are used to find the location of the artifact.
 
 ### Query Artifactory
 *For more information about Artifactory, see their [website](https://jfrog.com/artifactory/).*
@@ -33,10 +41,75 @@ artifact.
 The data extracted from an ArtC is used to send an [AQL](https://www.jfrog.com/confluence/display/RTF/Artifactory+Query+Language) 
 query to Artifactory in order find the location of the artifact referenced in the ArtC event.   
 
-### Broadcast EiffelArtifactPublishedEvent
+#### The AQL Query
+While users are able to specify a custom AQL query in the *eiffel.config* file, there is little reason to do so at the moment. The only variables available when constructing the AQL query are `artifact_filename` and `build_path_substring`. 
+It is therefore recommended to use the default AQL query described below.
+
+*Default AQL query:* 
+```
+items.find(
+    {{
+        "artifact.name":"{artifact_name}",
+        "artifact.module.build.url":
+            {{"$match":"*{build_path_substring}*"}}
+     }}
+).include("name","repo","path")
+```
+
+The query is populated with `artifact_filename` and `build_path_substring` extracted from 
+the ArtC data.identity field. 
+
+Eiffelactory uses Artifactory's REST API's AQL endpoint at *<artifactory_url>/api/search/aql* to find the location of an artifact.
+If the artifact referenced in the ArtC is stored in Artifactory, the response will look like this:
+```
+{
+"results" : [ {
+  "repo" : "slask",
+  "path" : "eiffelactory",
+  "name" : "eiffelactory.txt"
+} ],
+"range" : {
+  "start_pos" : 0,
+  "end_pos" : 1,
+  "total" : 1
+}
+}
+```
+You get the location of the artifact by concatenating the Artifactory url with repo, path and name in the response: *<artifactory_url>/slask/eiffelactory/eiffelactory.txt*.
+### Broadcast EiffelArtifactPublishedEvent (ArtP)
 *For more information about this event, see the [specification](https://github.com/eiffel-community/eiffel/blob/master/eiffel-vocabulary/EiffelArtifactPublishedEvent.md).*
 
-*TODO: describe the generated event*
+Once the location of the artifact is known, Eiffelactory generates an ArtP event and broadcasts 
+it to the RabbitMQ exchange configured in *eiffelactory.config*.
+
+*ArtP example:*
+```
+{
+    "data": {
+        "locations": [
+            {
+                "type": "ARTIFACTORY",
+                "uri": "https://localhost/artifactory/slask/eiffelactory/eiffelactory.txt"
+            }
+        ]
+    },
+    "links": [
+        {
+            "target": "5de6f82d-52b6-44ae-bdbb-0be4fc213184",
+            "type": "ARTIFACT"
+        }
+    ],
+    "meta": {
+        "id": "c5486262-0c51-4584-9565-00149cbff165",
+        "source": {
+            "name": "EIFFELACTORY"
+        },
+        "time": 1564048029070,
+        "type": "EiffelArtifactPublishedEvent",
+        "version": "3.0.0"
+    }
+}
+```
 
 ## Installation
 *TODO: how to install*
@@ -68,7 +141,7 @@ password = somepassword
 aql_search_string =
     items.find(
         {{
-            "name":"{artifact_name}",
+            "artifact.name":"{artifact_name}",
             "artifact.module.build.url":
                 {{"$match":"*{build_path_substring}*"}}
          }}
