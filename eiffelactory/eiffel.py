@@ -46,10 +46,19 @@ class Meta(dict):
     :param source: a description of the source of the event
     """
 
-    def __init__(self, event_type, version, tags=None, source=None):
+    def __init__(self,
+                 event_type,
+                 version,
+                 event_id=None,
+                 time=None,
+                 tags=None,
+                 source=None):
 
-        event_id = str(uuid.uuid4())
-        time = utils.current_time_millis()
+        if event_id is None:
+            event_id = str(uuid.uuid4())
+
+        if time is None:
+            time = utils.current_time_millis()
 
         super().__init__(self,
                          id=event_id,
