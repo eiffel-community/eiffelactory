@@ -6,17 +6,17 @@ from eiffelactory import artifactory
 artifact_filename = 'artifact.txt'
 build_path_substring = 'job/TEST/job/BUILD_NAME/255'
 query_string =\
-    'items.find({"name":"artifact.txt",' \
+    'items.find({"artifact.name":"artifact.txt",' \
     '"artifact.module.build.url":' \
     '{"$match":"*job/TEST/job/BUILD_NAME/255*"}}' \
     ').include("name","repo","path")'
 wrong_query_string = \
-    'items.find({"name":"wrong_file.txt",' \
+    'items.find({"artifact.name":"wrong_file.txt",' \
     '"artifact.module.build.url":' \
     '{"$match":"*job/TEST/job/BUILD_NAME/255*"}}' \
     ').include("name","repo","path")'
 bad_query_string = \
-    'items.find({"name":"{"file.txt"}"},' \
+    'items.find({"artifact.name":"{"file.txt"}"},' \
     '"artifact.module.build.url":' \
     '{"$match":"*{"job/TEST/job/BUILD_NAME/255"}*"}}' \
     ').include("name","repo","path")'

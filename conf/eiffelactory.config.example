@@ -17,7 +17,7 @@ password = somepassword
 aql_search_string =
     items.find(
         {{
-            "name":"{artifact_name}",
+            "artifact.name":"{artifact_name}",
             "artifact.module.build.url":
                 {{"$match":"*{build_path_substring}*"}}
          }}
