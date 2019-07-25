@@ -2,7 +2,7 @@ version: "3.6"
 
 services:
   eiffelactory:
-    image: eiffelactory:latest
+    image: {{ docker_image }}
     volumes:
       - type: bind
         source: ./conf

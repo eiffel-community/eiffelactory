@@ -1,0 +1,6 @@
+[localhostt]
+localhost   ansible_connection=local
+
+[remote]
+# this is just an example, credentials should be kept in Ansible vault
+<IP-address> ansible_user=<user_name> ansible_password=<password> ansible_python_interpreter=/usr/bin/python2.7

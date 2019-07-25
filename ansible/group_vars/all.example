@@ -1,0 +1,2 @@
+conf_file_src: <project_src_dir>/eiffelactory/conf/eiffelactory.config
+docker_compose_file_src: <project_src_dir>/eiffelactory/docker-compose.yml

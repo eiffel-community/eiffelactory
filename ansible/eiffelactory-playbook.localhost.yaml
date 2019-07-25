@@ -1,0 +1,35 @@
+# first, $ pip install ansible
+# $ ansible-playbook eiffelactory-playbook.localhost.yaml -i hosts
+# from 'ansible' dir
+---
+- name: Setup project files
+  hosts: localhost
+  gather_facts: yes
+  tasks:
+  - name: Create the src directory
+    file:
+      path: '{{ item }}'
+      state: directory
+      mode: '0755'
+    with_items:
+      - '{{ project_dir_localhost }}'
+      - '{{ project_dir_localhost }}/conf'
+
+  - name: Copy conf file
+    copy:
+      src: '{{ conf_file_src }}'
+      dest: '{{ project_dir_localhost }}/conf/eiffelactory.config'
+
+  - name: Copy docker-compose file
+    copy:
+      src: '{{ docker_compose_file_src }}'
+      dest: '{{ project_dir_localhost }}/docker-compose.yml'
+
+- name: Start the eiffelactory container
+  hosts: localhost
+  gather_facts: yes
+  tasks:
+    - docker_compose:
+        project_src: '{{ project_dir_localhost}}'
+        state: present
+

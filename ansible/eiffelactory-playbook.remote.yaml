@@ -1,0 +1,57 @@
+---
+- name: Setup dependencies
+  hosts: remote
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Make sure pip is present
+      apt:
+        name: ['python-pip', 'python-virtualenv', 'python-setuptools']
+        state: present
+      environment:
+        http_proxy: '{{ http_proxy }}'
+        https_proxy: '{{ http_proxy }}'
+        ftp_proxy: '{{ http_proxy }}'
+        no_proxy: '{{ no_proxy }}'
+
+    - name: Install Ansible/Docker pip2 dependencies
+      pip:
+        name: docker-compose
+      environment:
+        http_proxy: '{{ http_proxy }}'
+        https_proxy: '{{ http_proxy }}'
+        ftp_proxy: '{{ http_proxy }}'
+        no_proxy: '{{ no_proxy }}'
+
+- name: Setup project files
+  hosts: remote
+  gather_facts: yes
+  become: yes
+  tasks:
+  - name: Create the src directory on host
+    file:
+      path: '{{ item }}'
+      state: directory
+      mode: '0755'
+    with_items:
+      - '{{ project_dir_remote }}'
+      - '{{ project_dir_remote }}/conf'
+
+  - name: Copy conf file
+    copy:
+      src: '{{ conf_file_src }}'
+      dest: '{{ project_dir_remote }}/conf/eiffelactory.config'
+
+  - name: Copy docker-compose file
+    template:
+      src: docker-compose.yml.j2
+      dest: '{{ project_dir_remote }}/docker-compose.yml'
+
+- name: Start the eiffelactory container
+  hosts: remote
+  gather_facts: yes
+  tasks:
+    - docker_compose:
+        project_src: '{{ project_dir_remote }}'
+        state: present
+

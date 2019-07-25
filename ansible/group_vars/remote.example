@@ -1,0 +1,4 @@
+project_dir_remote: <project_dir_on_remote_machine>
+http_proxy: <http_proxy>
+no_proxy: <no_proxy>
+docker_image: <docker_image_location>
