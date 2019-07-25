@@ -10,7 +10,7 @@ Parses option strings into collections or other formats if needed.
 """
 import configparser
 
-_DEFAULT_AQL_SEARCH_STRING = 'items.find({{"name":"{artifact_name}",' \
+_DEFAULT_AQL_SEARCH_STRING = 'items.find({{"artifact.name":"{artifact_name}",' \
                              '"artifact.module.build.url":{{"$match":"*{' \
                              'build_path_substring}*"}}}}).include("name",' \
                              '"repo","path")'
