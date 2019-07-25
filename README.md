@@ -42,8 +42,65 @@ query to Artifactory in order find the location of the artifact referenced in th
 *TODO: how to install*
 
 ## Usage
-#### eiffelactory.config
-*TODO: Explain the contents of the config file*
+### The eiffelactory.config file
+Eiffelactory can be configured by placing the *eiffelactory.config* file in the *conf* directory. 
+The config file contains 3 different sections, one for RabbitMQ options, one for Artifactory 
+options and one for Eiffelactory options. Users can use *eiffelactory.config.example* as a starting point.
+
+*conf/eiffelactory.config.example:*
+```
+[rabbitmq]
+username = someusername
+password = somepassword
+host = localhost
+port = 15672
+vhost = /
+exchange = someexchange
+exchange_type = topic
+routing_key = #
+queue = somequeue
+prefetch_count = 50
+
+[artifactory]
+url = https://localhost:8081/artifactory
+username = someusername
+password = somepassword
+aql_search_string =
+    items.find(
+        {{
+            "name":"{artifact_name}",
+            "artifact.module.build.url":
+                {{"$match":"*{build_path_substring}*"}}
+         }}
+    ).include("name","repo","path")
+
+[eiffelactory]
+# used to filter received messages by meta.source.name
+# if event_sources is not included, all ArtC events are processed
+event_sources = META_SOURCE_NAME, another-source_name
+``` 
+
+Not all keys are mandatory, Eiffelactory will provide default values for the following options:
+``` 
+[rabbitmq]
+vhost = /
+prefetch_count = 50
+routing_key = #
+
+[artifactory]
+aql_search_string =
+    items.find(
+        {{
+            "name":"{artifact_name}",
+            "artifact.module.build.url":
+                {{"$match":"*{build_path_substring}*"}}
+         }}
+    ).include("name","repo","path")
+    
+[eiffelactory]
+event_sources = None
+``` 
+All other keys must be present otherwise KeyError and configparser.NoOptionError will be raised. 
 
 ## Running tests
 Run all tests:
