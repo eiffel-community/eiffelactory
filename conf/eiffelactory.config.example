@@ -8,6 +8,7 @@ exchange = someexchange
 exchange_type = topic
 routing_key = #
 queue = somequeue
+prefetch_count = 50
 
 [artifactory]
 url = https://localhost:8081/artifactory
