@@ -51,10 +51,10 @@ class App:
 
         LOGGER_RECEIVED.info(event)
 
-        if CFG.eiffelactory.event_sources:
-            if not eiffel.is_sent_from_sources(
-                    event, CFG.eiffelactory.event_sources):
-                return
+        if CFG.eiffelactory.event_sources and
+           not eiffel.is_sent_from_sources(event,
+                                           CFG.eiffelactory.event_sources):
+            return
 
         artc_meta_id = event['meta']['id']
         artc_data_identity = event['data']['identity']
