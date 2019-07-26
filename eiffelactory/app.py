@@ -64,7 +64,7 @@ class App:
 
         if artifact:
             if len(artifact) > 1:
-                LOGGER_ARTIFACTS.error("AQL query returned %s artifacts",
+                LOGGER_ARTIFACTS.error("AQL query returned '%d' artifacts",
                                        len(artifact))
                 # this is here temporarily, we need to make sure that the AQL
                 # query works as expected. We shouldn't get more than one event,
