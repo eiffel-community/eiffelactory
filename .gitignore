@@ -16,6 +16,7 @@ eiffelactory.config
 
 # Pycache
 __pycache__/
+*.pyc
 
 # Logs
 logs/
@@ -25,3 +26,9 @@ logs/
 Dockerfile
 .dockerignore
 docker-compose.yml
+
+# ctags
+tags
+
+# vim
+*.swp
