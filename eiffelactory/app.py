@@ -37,6 +37,7 @@ class App:
         self.rmq_connection = rabbitmq.RabbitMQConnection(
             self.on_event_received)
         signal.signal(signal.SIGINT, self._signal_handler)
+        signal.signal(signal.SIGTERM, self._signal_handler)
 
     def on_event_received(self, event):
         """
