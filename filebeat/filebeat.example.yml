@@ -1,0 +1,15 @@
+filebeat.prospectors:
+- type: log
+  enabled: true
+  name: eiffelactory
+  paths:
+   - /var/log/*.log
+  fields:
+    type: http_access
+  fields_under_root: true
+  tags:
+  - "<tag>"
+
+output.logstash:
+  enabled: true
+  hosts: ["<ip-address>:<port>"]
