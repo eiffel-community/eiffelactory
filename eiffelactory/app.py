@@ -37,6 +37,7 @@ class App:
         self.rmq_connection = rabbitmq.RabbitMQConnection(
             self.on_event_received)
         signal.signal(signal.SIGINT, self._signal_handler)
+        signal.signal(signal.SIGTERM, self._signal_handler)
 
     def on_event_received(self, event):
         """
@@ -50,10 +51,10 @@ class App:
 
         LOGGER_RECEIVED.info(event)
 
-        if CFG.eiffelactory.event_sources:
-            if not eiffel.is_sent_from_sources(
-                    event, CFG.eiffelactory.event_sources):
-                return
+        if CFG.eiffelactory.event_sources and
+           not eiffel.is_sent_from_sources(event,
+                                           CFG.eiffelactory.event_sources):
+            return
 
         artc_meta_id = event['meta']['id']
         artc_data_identity = event['data']['identity']
@@ -63,7 +64,7 @@ class App:
 
         if artifact:
             if len(artifact) > 1:
-                LOGGER_ARTIFACTS.error("AQL query returned %s artifacts",
+                LOGGER_ARTIFACTS.error("AQL query returned '%d' artifacts",
                                        len(artifact))
                 # this is here temporarily, we need to make sure that the AQL
                 # query works as expected. We shouldn't get more than one event,
@@ -82,10 +83,10 @@ class App:
         AQL query.
         """
 
-        location = '%s/%s/%s/%s' % (CFG.artifactory.url,
-                                    artifact['repo'],
-                                    artifact['path'],
-                                    artifact['name'])
+        location = '{}/{}/{}/{}'.format(CFG.artifactory.url,
+                                        artifact['repo'],
+                                        artifact['path'],
+                                        artifact['name'])
 
         artp_event = eiffel.create_artifact_published_event(
             artc_meta_id, [eiffel.Location(location)])
