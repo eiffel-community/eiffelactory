@@ -83,10 +83,10 @@ class App:
         AQL query.
         """
 
-        location = '%s/%s/%s/%s' % (CFG.artifactory.url,
-                                    artifact['repo'],
-                                    artifact['path'],
-                                    artifact['name'])
+        location = '{}/{}/{}/{}'.format(CFG.artifactory.url,
+                                        artifact['repo'],
+                                        artifact['path'],
+                                        artifact['name'])
 
         artp_event = eiffel.create_artifact_published_event(
             artc_meta_id, [eiffel.Location(location)])
