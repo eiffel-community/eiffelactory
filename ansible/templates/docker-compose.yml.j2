@@ -2,13 +2,17 @@ version: "3.6"
 
 services:
   eiffelactory:
-    image: {{ docker_image }}
+    image: {{ eiffelactory_docker_image }}
     volumes:
       - type: bind
         source: ./conf
         target: /app/conf
-    networks:
-      - eiffelactorynet
-
-networks:
-  eiffelactorynet:
+      - type: bind
+        source: ./filebeat-logs
+        target: /app/logs
+  filebeat:
+    image: {{ filebeat_docker_image }}
+    volumes:
+      - type: bind
+        source: ./filebeat-logs
+        target: /var/log

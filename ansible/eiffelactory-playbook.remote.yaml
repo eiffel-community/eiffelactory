@@ -36,6 +36,7 @@
     with_items:
       - '{{ project_dir_remote }}'
       - '{{ project_dir_remote }}/conf'
+      - '{{ project_dir_remote }}/filebeat-logs'
 
   - name: Copy conf file
     copy:
