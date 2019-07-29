@@ -50,15 +50,13 @@ class App:
         :param event: RabbitMQ message
         :return:
         """
-        if not eiffel.is_artifact_created_event(event):
+        if not eiffel.is_artifact_created_event(event) or (
+            CFG.eiffelactory.event_sources and
+            not eiffel.is_sent_from_sources(event,
+                                            CFG.eiffelactory.event_sources)):
             return
 
         LOGGER_RECEIVED.info(event)
-
-        if CFG.eiffelactory.event_sources and\
-                not eiffel.is_sent_from_sources(event,
-                                                CFG.eiffelactory.event_sources):
-            return
 
         artc_meta_id = event['meta']['id']
         artc_data_identity = event['data']['identity']
@@ -111,7 +109,5 @@ class App:
         :param frame:
         :return:
         """
-        # closes down everything when Ctrl-C is pressed
         self.rmq_connection.close_connection()
-        print("\nExiting")
         sys.exit(0)
