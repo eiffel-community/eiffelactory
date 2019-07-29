@@ -25,16 +25,19 @@ class ArtifactoryConnection:
             build_path_substring=build_path_substring).replace('\n', '')
 
     def _execute_aql_query(self, query_string):
-        response = requests.post(self.artifactory_search_url,
-                                 auth=HTTPBasicAuth(self.username,
-                                                    self.password),
-                                 data=query_string)
-        content = response.content.decode('utf-8')
-        if response.status_code == 200:
-            return content
-        self.app_logger.error("Artifactory error: %d, %s",
-                              response.status_code, content)
-        return None
+        try:
+            response = requests.post(self.artifactory_search_url,
+                                     auth=HTTPBasicAuth(self.username,
+                                                        self.password),
+                                     data=query_string)
+            content = response.content.decode('utf-8')
+            if response.status_code == 200:
+                return content
+            self.app_logger.error("Artifactory error: %d, %s",
+                                  response.status_code, content)
+            return None
+        except OSError as ex:
+            self.app_logger.error(ex)
 
     def find_artifact_on_artifactory(self, artifact_filename,
                                      build_path_substring):
