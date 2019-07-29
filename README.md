@@ -75,7 +75,7 @@ If the artifact referenced in the ArtC is stored in Artifactory, the response wi
 }
 }
 ```
-You get the location of the artifact by concatenating the Artifactory url with repo, path and name in the response: *<artifactory_url>/slask/eiffelactory/eiffelactory.txt*.
+The location of the artifact is formatted by concatenating the Artifactory url with repo, path and name in the response: *<artifactory_url>/slask/eiffelactory/eiffelactory.txt*.
 ### Broadcast EiffelArtifactPublishedEvent (ArtP)
 *For more information about this event, see the [specification](https://github.com/eiffel-community/eiffel/blob/master/eiffel-vocabulary/EiffelArtifactPublishedEvent.md).*
 
@@ -111,10 +111,19 @@ it to the RabbitMQ exchange configured in *eiffelactory.config*.
 }
 ```
 
-## Installation
-*TODO: how to install*
+## How to run Eiffelactory
+The easiest way to run the application is to create a virtual environment, 
+install the dependencies and run main.py.
+```bash
+$ python3 -m venv venv
+$ source venv/bin/activate
+$ pip install -r requirements.txt
+$ python3 main.py
+```
 
-## Usage
+In the repository there are examples of how to deploy Eiffelactory using Dockerfile, docker-compose and Ansible. 
+
+## Configuration
 ### The eiffelactory.config file
 Eiffelactory can be configured by placing the *eiffelactory.config* file in the *conf* directory.
 The config file contains 3 different sections, one for RabbitMQ options, one for Artifactory
@@ -164,7 +173,7 @@ routing_key = #
 aql_search_string =
     items.find(
         {{
-            "name":"{artifact_name}",
+            "artifact.name":"{artifact_name}",
             "artifact.module.build.url":
                 {{"$match":"*{build_path_substring}*"}}
          }}
