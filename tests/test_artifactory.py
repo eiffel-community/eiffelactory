@@ -1,7 +1,8 @@
 import unittest
-from unittest import mock
+from unittest.mock import patch
 
 from eiffelactory import artifactory
+from eiffelactory import config
 
 artifact_filename = 'artifact.txt'
 build_path_substring = 'job/TEST/job/BUILD_NAME/255'
@@ -45,41 +46,52 @@ def mocked_requests_post(search_url, auth, data):
                                   content=b'Failed to parse query')
 
 
+class MockedConfig:
+    def __init__(self):
+        cfg = config.Config('tests/all_options.config')
+        self.artifactory = cfg.artifactory
+
+
 class TestArtifactory(unittest.TestCase):
 
+    def setUp(self):
+        self.artifactory = artifactory.ArtifactoryConnection(
+            MockedConfig().artifactory)
+
     def test__format_aql_query(self):
-        print(artifactory._format_aql_query(
-            artifact_filename, build_path_substring))
-        self.assertEqual(artifactory._format_aql_query(
+        self.assertEqual(self.artifactory._format_aql_query(
             artifact_filename, build_path_substring),
             query_string)
 
-    @mock.patch('eiffelactory.artifactory.requests.post',
-                side_effect=mocked_requests_post)
-    def test__execute_aql_query(self, mocked_post):
-        response_content = artifactory._execute_aql_query(query_string)
+    @patch('eiffelactory.artifactory.requests.post',
+           side_effect=mocked_requests_post)
+    def test__execute_aql_query(self, mocked_requests_post):
+        response_content = self.artifactory._execute_aql_query(query_string)
         self.assertEqual(response_content, response_dict)
 
-        response_content = artifactory._execute_aql_query(wrong_query_string)
+        response_content = self.artifactory._execute_aql_query(wrong_query_string)
         self.assertEqual(response_content, empty_dict)
 
-        response_content = artifactory._execute_aql_query(bad_query_string)
+        response_content = self.artifactory._execute_aql_query(bad_query_string)
         self.assertEqual(response_content, None)
 
-    @mock.patch('eiffelactory.artifactory.requests.post',
-                side_effect=mocked_requests_post)
-    def test_find_artifact_on_artifactory(self, mocked_post):
-        result = artifactory.\
+    @patch('eiffelactory.artifactory.requests.post',
+           side_effect=mocked_requests_post)
+    def test_find_artifact_on_artifactory(self, mocked_requests_post):
+        result = self.artifactory.\
             find_artifact_on_artifactory(artifact_filename,
                                          build_path_substring)
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]['name'], artifact_filename)
 
         artifact_filename2 = 'wrong_file.txt'
-        result = artifactory.\
+        result = self.artifactory.\
             find_artifact_on_artifactory(artifact_filename2,
                                          build_path_substring)
         self.assertEqual(result, [])
+
+    def tearDown(self):
+        self.artifactory = None
 
 
 if __name__ == '__main__':
