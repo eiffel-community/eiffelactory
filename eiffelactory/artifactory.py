@@ -11,20 +11,21 @@ from kombu.utils import json
 
 class ArtifactoryConnection:
     def __init__(self, artifactory_config):
-        self.AQL_DOMAIN_SEARCH_STRING = artifactory_config.aql_search_string
-        self.ARTIFACTORY_SEARCH_URL = artifactory_config.url + '/api/search/aql/'
         self.artifacts_logger = logging.getLogger('artifacts')
         self.app_logger = logging.getLogger('app')
+        self.aql_domain_search_string = artifactory_config.aql_search_string
+        self.artifactory_search_url = artifactory_config.url + \
+            '/api/search/aql/'
         self.username = artifactory_config.username
         self.password = artifactory_config.password
 
     def _format_aql_query(self, artifact_filename, build_path_substring):
-        return self.AQL_DOMAIN_SEARCH_STRING.format(
+        return self.aql_domain_search_string.format(
             artifact_name=artifact_filename,
             build_path_substring=build_path_substring).replace('\n', '')
 
     def _execute_aql_query(self, query_string):
-        response = requests.post(self.ARTIFACTORY_SEARCH_URL,
+        response = requests.post(self.artifactory_search_url,
                                  auth=HTTPBasicAuth(self.username,
                                                     self.password),
                                  data=query_string)
@@ -35,7 +36,8 @@ class ArtifactoryConnection:
                               response.status_code, content)
         return None
 
-    def find_artifact_on_artifactory(self, artifact_filename, build_path_substring):
+    def find_artifact_on_artifactory(self, artifact_filename,
+                                     build_path_substring):
         """
         Queries Artifactory for the artifact, using the filename and the path
         substring from the purl, where it tries to match it with the build url

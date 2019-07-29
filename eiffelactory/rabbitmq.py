@@ -6,43 +6,40 @@ import logging
 from kombu import Connection, Exchange, Queue
 from kombu.utils import json
 
-from eiffelactory import config
-
-CFG = config.Config().rabbitmq
-
 
 class RabbitMQConnection:
     """
     Class handling receiving and publishing message on the RabbitMQ messages bus
     """
-    def __init__(self, message_callback):
+    def __init__(self,  rabbitmq_config, message_callback):
+        self.rabbitmq_config = rabbitmq_config
         self.app_logger = logging.getLogger('app')
         self.message_callback = message_callback
 
-        self.exchange = Exchange(CFG.exchange)
+        self.exchange = Exchange(self.rabbitmq_config.exchange)
         self.connection = Connection(transport='amqp',
-                                     hostname=CFG.host,
-                                     port=CFG.port,
-                                     userid=CFG.username,
-                                     password=CFG.password,
-                                     virtual_host=CFG.vhost,
+                                     hostname=self.rabbitmq_config.host,
+                                     port=self.rabbitmq_config.port,
+                                     userid=self.rabbitmq_config.username,
+                                     password=self.rabbitmq_config.password,
+                                     virtual_host=self.rabbitmq_config.vhost,
                                      ssl=True)
 
         self.connection.connect()
         self.producer = self.connection.Producer(serializer='json',
                                                  auto_declare=True)
         self.queue = Queue(channel=self.connection.channel(),
-                           name=CFG.queue,
-                           routing_key=CFG.routing_key)
+                           name=self.rabbitmq_config.queue,
+                           routing_key=self.rabbitmq_config.routing_key)
         self.queue.declare()
-        self.queue.bind_to(exchange=Exchange(CFG.exchange),
-                           routing_key=CFG.routing_key)
+        self.queue.bind_to(exchange=Exchange(self.rabbitmq_config.exchange),
+                           routing_key=self.rabbitmq_config.routing_key)
         self.consumer = self.connection.\
             Consumer(
                     queues=self.queue,
                     callbacks=[self._handle_message],
                     prefetch_count=
-                    CFG.prefetch_count)
+                    self.rabbitmq_config.prefetch_count)
         self.consuming = True
 
     def _handle_message(self, body, message):
@@ -78,7 +75,7 @@ class RabbitMQConnection:
                                   'max_retries': 30,
                               },
                               exchange=self.exchange,
-                              routing_key=CFG.routing_key)
+                              routing_key=self.rabbitmq_config.routing_key)
 
     def read_messages(self):
         """

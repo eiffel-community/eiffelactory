@@ -36,8 +36,8 @@ class App:
     events
     """
     def __init__(self):
-        self.rmq_connection = rabbitmq.RabbitMQConnection(
-            self.on_event_received)
+        self.rmq_connection = rabbitmq.RabbitMQConnection(CFG.rabbitmq,
+                                                          self.on_event_received)
         self.artifactory_connection = artifactory.ArtifactoryConnection(
             CFG.artifactory)
         signal.signal(signal.SIGINT, self._signal_handler)
