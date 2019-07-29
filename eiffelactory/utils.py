@@ -50,13 +50,13 @@ def parse_purl(purl):
     """
     # pkg:<build_path>/<intermediate_directories>/
     # <artifact_filename>@< build_number >
-    artifact_filename_and_build = purl.split('/')[-1]
-    artifact_filename = artifact_filename_and_build.split('@')[0]
-    build_path = purl.split('pkg:')[1].split('/artifacts')[0]
+    # artifact_filename_and_build = purl.split('/')[-1]
+    # artifact_filename = artifact_filename_and_build.split('@')[0]
+    # build_path = purl.split('pkg:')[1].split('/artifacts')[0]
 
     # pkg:<intermediate_directories>/<artifact_filename>@<build_number>?
     # build_path=< build_path >
     # for when Eiffel Broadcaster is updated
-    # artifact_filename = purl.split('@')[0].split('/')[-1]
-    # build_path = purl.split('?build_path=')[-1]
+    artifact_filename = purl.split('@')[0].split('/')[-1]
+    build_path = purl.split('?build_path=')[-1]
     return artifact_filename, build_path
