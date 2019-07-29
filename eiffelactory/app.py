@@ -20,10 +20,12 @@ if not os.path.exists('logs'):
 utils.setup_logger('received', 'received.log', logging.INFO)
 utils.setup_logger('artifacts', 'artifacts.log', logging.DEBUG)
 utils.setup_logger('published', 'published.log', logging.INFO)
+utils.setup_logger('app', 'eiffelactory.log', logging.DEBUG)
 
 LOGGER_ARTIFACTS = logging.getLogger('artifacts')
 LOGGER_PUBLISHED = logging.getLogger('published')
 LOGGER_RECEIVED = logging.getLogger('received')
+LOGGER_APP = logging.getLogger('app')
 
 CFG = config.Config()
 
@@ -66,14 +68,9 @@ class App:
 
         if artifact:
             if len(artifact) > 1:
-                LOGGER_ARTIFACTS.error("AQL query returned '%d' artifacts",
-                                       len(artifact))
-                # this is here temporarily, we need to make sure that the AQL
-                # query works as expected. We shouldn't get more than one event,
-                # but for now if we do, we want to send ArtP for all of them.
-                # This will later be replaces by a return statement instead
-                for art in artifact:
-                    self._publish_artp_event(artc_meta_id, art)
+                LOGGER_APP.error("AQL query returned '%d' artifacts",
+                                 len(artifact))
+                return
             else:
                 self._publish_artp_event(artc_meta_id, artifact[0])
 

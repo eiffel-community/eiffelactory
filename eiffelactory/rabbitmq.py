@@ -1,6 +1,8 @@
 """
 Module for sending and receiving messages from RabbitMQ.
 """
+import logging
+
 from kombu import Connection, Exchange, Queue
 from kombu.utils import json
 
@@ -14,6 +16,7 @@ class RabbitMQConnection:
     Class handling receiving and publishing message on the RabbitMQ messages bus
     """
     def __init__(self, message_callback):
+        self.app_logger = logging.getLogger('app')
         self.message_callback = message_callback
 
         self.exchange = Exchange(CFG.exchange)
@@ -84,8 +87,13 @@ class RabbitMQConnection:
         :return:
         """
         with self.consumer:
+            self.app_logger.info("Consumer is starting to consume"
+                                 " RabbitMQ messages.")
             while self.consuming:
                 self.connection.drain_events()
+            self.app_logger.info("Consumer is stopping consuming"
+                                 "RabbitMQ messages.")
+        self.app_logger.info("Consumer stopped consuming RabbitMQ messages.")
 
     def close_connection(self):
         """
@@ -96,3 +104,5 @@ class RabbitMQConnection:
         self.consuming = False
         self.producer.release()
         self.connection.release()
+        self.app_logger.info("SIGINT/SIGTERM received. "
+                             "Closing RabbiMQ connection.")

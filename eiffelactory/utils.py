@@ -22,7 +22,9 @@ def setup_logger(logname, filename, level=logging.WARNING):
     :param filename: the filename to log to
     :param level: the minimum log level
     """
+    formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(message)s')
     handler = logging.FileHandler("logs/%s" % filename)
+    handler.setFormatter(formatter)
     logger = logging.getLogger(logname)
     logger.setLevel(level)
     logger.addHandler(handler)
