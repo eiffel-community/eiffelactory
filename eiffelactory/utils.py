@@ -29,6 +29,8 @@ def setup_logger(logname, filename, level=logging.WARNING):
     logger.setLevel(level)
     logger.addHandler(handler)
 
+    return logger
+
 
 def remove_none_from_dict(dictionary):
     """

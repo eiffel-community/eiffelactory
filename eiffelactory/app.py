@@ -17,15 +17,13 @@ from eiffelactory import utils
 if not os.path.exists('logs'):
     os.makedirs('logs')
 
-utils.setup_logger('received', 'received.log', logging.INFO)
-utils.setup_logger('artifacts', 'artifacts.log', logging.DEBUG)
-utils.setup_logger('published', 'published.log', logging.INFO)
-utils.setup_logger('app', 'eiffelactory.log', logging.DEBUG)
 
-LOGGER_ARTIFACTS = logging.getLogger('artifacts')
-LOGGER_PUBLISHED = logging.getLogger('published')
-LOGGER_RECEIVED = logging.getLogger('received')
-LOGGER_APP = logging.getLogger('app')
+LOGGER_ARTIFACTS = utils.setup_logger('artifacts', 'artifacts.log',
+                                      logging.DEBUG)
+LOGGER_PUBLISHED = utils.setup_logger('published', 'published.log',
+                                      logging.INFO)
+LOGGER_RECEIVED = utils.setup_logger('received', 'received.log', logging.INFO)
+LOGGER_APP = utils.setup_logger('app', 'eiffelactory.log', logging.DEBUG)
 
 CFG = config.Config()
 
