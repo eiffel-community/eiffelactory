@@ -61,7 +61,7 @@ class App:
         artc_meta_id = event['meta']['id']
         artc_data_identity = event['data']['identity']
 
-        artifact = artifactory.\
+        artifact = self.artifactory_connection.\
             find_artifact_on_artifactory(*utils.parse_purl(artc_data_identity))
 
         if artifact:
