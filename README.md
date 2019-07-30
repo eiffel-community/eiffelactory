@@ -27,11 +27,11 @@ ArtC event in order to extract information about the created artifact.
 
 *data.identity purl example:*
 ```
-pkg:job/TEST/job/username.project/123/artifacts/eiffelactory.txt@123
+pkg:artifacts/eiffelactory.txt@123?build_path=job/TEST/job/USR/job/PROJECT/123
 ```
 
 After parsing the purl above `artifact_name` will be *"eiffelactory.txt"* and
-`build_path_substring` will be *"job/TEST/job/username.project/123"*.
+`build_path_substring` will be *"job/TEST/job/USR/job/PROJECT/123"*.
 
 Both pieces of information are used to find the location of the artifact.
 
@@ -112,6 +112,9 @@ it to the RabbitMQ exchange configured in *eiffelactory.config*.
 ```
 
 ## How to run Eiffelactory
+In order to run Eiffelactory the *eiffelactory.config* file must be placed in the 
+*conf* folder.
+
 The easiest way to run the application is to create a virtual environment, 
 install the dependencies and run main.py.
 ```bash
