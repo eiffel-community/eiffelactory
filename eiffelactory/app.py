@@ -86,7 +86,7 @@ class App:
         artp_event = eiffel.create_artifact_published_event(
             artc_meta_id, [eiffel.Location(location)])
 
-        artp_event_json = json.dumps(utils.remove_none_from_dict(artp_event))
+        artp_event_json = json.dump(utils.remove_none_from_dict(artp_event))
 
         self.rmq_connection.publish_message(artp_event_json)
 
