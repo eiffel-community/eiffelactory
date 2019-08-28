@@ -6,8 +6,8 @@ import logging
 import signal
 import sys
 import os
+import json
 
-from kombu.utils import json
 from eiffelactory import artifactory
 from eiffelactory import config
 from eiffelactory import eiffel
@@ -86,9 +86,9 @@ class App:
         artp_event = eiffel.create_artifact_published_event(
             artc_meta_id, [eiffel.Location(location)])
 
-        artp_event_json = json.dump(utils.remove_none_from_dict(artp_event))
+        artp_event_json = json.dumps(utils.remove_none_from_dict(artp_event))
 
-        self.rmq_connection.publish_message(artp_event_json)
+        self.rmq_connection.publish_message(json.loads(artp_event_json))
 
         LOGGER_ARTIFACTS.info(artifact)
         LOGGER_PUBLISHED.info(artp_event_json)
