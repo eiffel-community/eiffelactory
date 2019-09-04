@@ -34,7 +34,7 @@ class ArtifactoryConnection:
             if response.status_code == 200:
                 return content
             self.app_logger.error("Artifactory error: %d, %s",
-                                  response.status_code, content)
+                                  response.status_code, response.reason)
             return None
         except OSError as ex:
             self.app_logger.error(ex)
