@@ -18,12 +18,12 @@ if not os.path.exists('logs'):
     os.makedirs('logs')
 
 
-LOGGER_ARTIFACTS = utils.setup_logger('artifacts', 'artifacts.log',
-                                      logging.DEBUG)
-LOGGER_PUBLISHED = utils.setup_logger('published', 'published.log',
-                                      logging.INFO)
-LOGGER_RECEIVED = utils.setup_logger('received', 'received.log', logging.INFO)
-LOGGER_APP = utils.setup_logger('app', 'eiffelactory.log', logging.DEBUG)
+LOGGER_ARTIFACTS = utils.setup_event_logger('artifacts', 'artifacts.log',
+                                            logging.DEBUG)
+LOGGER_PUBLISHED = utils.setup_event_logger('published', 'published.log',
+                                            logging.INFO)
+LOGGER_RECEIVED = utils.setup_event_logger('received', 'received.log', logging.INFO)
+LOGGER_APP = utils.setup_app_logger('app', 'eiffelactory.log', logging.DEBUG)
 
 CFG = config.Config()
 

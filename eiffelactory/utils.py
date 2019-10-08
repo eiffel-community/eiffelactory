@@ -14,15 +14,41 @@ def current_time_millis():
     return int(round(time.time() * 1000))
 
 
-def setup_logger(logname, filename, level=logging.WARNING):
+def setup_event_logger(logname, filename, level=logging.WARNING):
     """
-    Creates a logger with a file handler.
+    Creates a logger for Eiffel events (received/published/AQL queries).
 
     :param logname: the name of the logger
     :param filename: the filename to log to
     :param level: the minimum log level
     """
-    formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(message)s')
+    formatter = logging.Formatter('%(asctime)s : %(message)s')
+    return setup_logger(logname, filename, formatter, level=level)
+
+
+def setup_app_logger(logname, filename, level=logging.WARNING):
+    """
+    Creates a logger for app debugging.
+
+    :param logname: the name of the logger
+    :param filename: the filename to log to
+    :param level: the minimum log level
+    """
+    formatter = logging.Formatter(
+        '%(asctime)s : %(levelname)-8s [%(module)s:%(lineno)d]  %(message)s')
+    return setup_logger(logname, filename, formatter, level=level)
+
+
+def setup_logger(logname, filename, formatter, level=logging.WARNING):
+    """
+    Sets up a logger with a file handle.
+
+    :param logname: the name of the logger
+    :param filename: the filename to log to
+    :param formatter: the log message formatter to use
+    :param level: the minimum log level
+    :return:
+    """
     handler = logging.FileHandler("logs/%s" % filename)
     handler.setFormatter(formatter)
     logger = logging.getLogger(logname)
