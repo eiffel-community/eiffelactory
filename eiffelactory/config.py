@@ -114,6 +114,10 @@ class RabbitMQConfig(ConfigSection):
     def prefetch_count(self):
         return self.getint('prefetch_count')
 
+    @property
+    def consumer_tag(self):
+        return self.get('consumer_tag')
+
 
 class ArtifactoryConfig(ConfigSection):
     """

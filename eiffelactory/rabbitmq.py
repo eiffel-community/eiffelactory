@@ -39,7 +39,8 @@ class RabbitMQConnection:
                     queues=self.queue,
                     callbacks=[self._handle_message],
                     prefetch_count=
-                    self.rabbitmq_config.prefetch_count)
+                    self.rabbitmq_config.prefetch_count,
+                    tag_prefix=self.rabbitmq_config.consumer_tag)
         self.consuming = True
 
     def _handle_message(self, body, message):

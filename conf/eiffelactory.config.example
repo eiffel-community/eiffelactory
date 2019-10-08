@@ -9,6 +9,7 @@ exchange_type = topic
 routing_key = #
 queue = somequeue
 prefetch_count = 50
+consumer_tag = eiffelactory
 
 [artifactory]
 url = https://localhost:8081/artifactory
