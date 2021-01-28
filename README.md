@@ -17,6 +17,8 @@
 
 <img src="./images/logo.png" alt="Eiffelactory: Eiffel Artifactory Microservice" width="350"/>
 
+[![Sandbox badge](https://img.shields.io/badge/Stage-Sandbox-yellow)](https://github.com/eiffel-community/community/blob/master/PROJECT_LIFECYCLE.md#stage-sandbox)
+
 # Eiffelactory: Eiffel Artifactory Microservice
 Eiffelactory is a service written in Python that consumes EiffelArtifactCreated
 events from a RabbitMQ message bus. The event data is then used to query Artifactory
